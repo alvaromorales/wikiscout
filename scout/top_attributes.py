@@ -3,52 +3,30 @@ import re
 from mrjob.protocol import JSONValueProtocol
 from mrjob.job import MRJob
 from collections import Counter
-from tools.infobox import parse_infobox, get_infobox_attributes
-
-# import mwparserfromhell
-
-# # Parses an infobox from the wikipedia dump
-# def parse_infobox(infobox_template,description):
-#     infobox_contents = ''.join(['|','|'.join(description)])
-#     infobox_text = ''.join(['{{',infobox_template.lower(),'\n',infobox_contents,'\n}}'])
-
-#     infobox = mwparserfromhell.parse(infobox_text)
-    
-#     templates = infobox.filter_templates()
-#     if len(templates) > 0:
-#         if len(templates) > 1:
-#             raise
-#         return templates[0]
-    
-# Returns a list of infobox attributes
-def get_infobox_attributes(infobox):
-    return [p.name.rstrip() for p in infobox.params]
+from tools import infobox
 
 class MRTopAttributes(MRJob):
     INPUT_PROTOCOL = JSONValueProtocol
     OUTPUT_PROTOCOL = JSONValueProtocol       
 
-    def validate_attribute(self,a):
-        return not a.isdigit()
-
-    def validate_template(self,t):
-        return re.match('^[a-z_]+$',t) != None
-    
     def mapper(self, key, article):
-        if 'infobox' in article:
-            infobox_template = article['infobox']['name'].lower()
-            description = article['infobox']['description']
+        if 'infobox' not in article:
+            return
+
+        infobox_template = infobox.normalize_template(article['infobox']['name'])
+        description = article['infobox']['description']
             
-            if infobox_template != '' and self.validate_template(infobox_template) and description != []:
-                infobox = parse_infobox(infobox_template,description)
+        if infobox_template != '' and infobox.validate_template(infobox_template) and description != []:
+            i = infobox.parse(infobox_template,description)
             
-                if infobox != None:
-                    attributes = get_infobox_attributes(infobox)
-                    
-                    for a in attributes:
-                        if self.validate_attribute(a):
-                            yield infobox_template, (a.lower(),1)
-                    
+            if i is None:
+                return
+            
+            attributes = [infobox.normalize_attribute(a) for a in infobox.get_attributes(i) if infobox.validate_attribute(a)]
+            
+            for a in attributes:
+                yield infobox_template, (a,1)
+                
     def reducer(self, infobox_template, attribute_counts):
         attributes = {}
         
@@ -59,7 +37,7 @@ class MRTopAttributes(MRJob):
                 attributes[a] = count
 
         total = sum(attributes.itervalues())
-        t = int(total*0.15)
+        t = int(total*0.05)
         
         top_attributes = [a for a in attributes if attributes[a] >= t]
         
