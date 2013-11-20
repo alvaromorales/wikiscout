@@ -1,23 +1,6 @@
 import mwparserfromhell
 import re
 
-# Parses an infobox from the json-wikipedia dump
-def parse(infobox_template,description):
-    infobox_contents = ''.join(['|','|'.join(description)])
-    infobox_text = ''.join(['{{',infobox_template.lower(),'\n',infobox_contents,'\n}}'])
-
-    infobox = mwparserfromhell.parse(infobox_text)
-    
-    templates = infobox.filter_templates()
-    if len(templates) > 0:
-        if len(templates) > 1:
-            raise
-        return templates[0]
-    
-# Returns a list of infobox attributes
-def get_attributes(infobox):
-    return [p.name.strip() for p in infobox.params]
-
 ### Templates
 
 def normalize_template(template):
@@ -38,3 +21,25 @@ def normalize_attribute(attribute):
 
 def validate_attribute(attribute):
     return not attribute.isdigit()
+
+# Parses an infobox from the json-wikipedia dump
+def parse(infobox_template,description):
+    infobox_contents = ''.join(['|','|'.join(description)])
+    infobox_text = ''.join(['{{',infobox_template.lower(),'\n',infobox_contents,'\n}}'])
+
+    infobox = mwparserfromhell.parse(infobox_text)
+    
+    templates = infobox.filter_templates()
+    if len(templates) > 0:
+        if len(templates) > 1:
+            raise
+        return templates[0]
+    
+# Returns a list of all valid, normalized infobox attributes
+def get_attributes(infobox):
+    return [normalize_attribute(a) for a in infobox.params if validate_attribute(a)]
+
+# Returns a list of all normalized attributes
+def get_all_attributes(infobox):
+    return [normalize_attribute(a) for a in infobox.params]
+
