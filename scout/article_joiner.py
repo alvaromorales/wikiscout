@@ -7,10 +7,11 @@ class MRArticleJoiner(MRJob):
     OUTPUT_PROTOCOL = JSONValueProtocol       
 
     def mapper(self, key, article):
-        title = article['title']
-        lang = article['lang']
+        if 'wikiTitle' in article and 'lang' in article:
+            title = article['wikiTitle']
+            lang = article['lang']
         
-        yield title, (article,lang)
+            yield title, (article,lang)
 
     def reducer(self, title, articles_lang):
         articles = []
@@ -19,7 +20,7 @@ class MRArticleJoiner(MRJob):
 
         if len(articles) == 2:
             join_result = {
-                'title': title,
+                'wikiTitle': title,
                 'en': None,
                 'simple': None
                 }
