@@ -50,13 +50,21 @@ def parse(infobox_template,description):
         return templates[0]
     
 # Returns a list of all valid, normalized infobox attributes
-def get_attributes(infobox):
-    normalized = [normalize_attribute(a.name) for a in infobox.params]
-    return filter(lambda a: validate_attribute(a),normalized)
+# Set raw=True to get a list of (normalized,raw) attribute tuples
+def get_attributes(infobox,raw=False):
+    if raw:
+        normalized = [(normalize_attribute(a.name),a.name.strip()) for a in infobox.params]
+        return filter(lambda (norm,raw): validate_attribute(norm),normalized)
+    else:
+        normalized = [normalize_attribute(a.name) for a in infobox.params]
+        return filter(lambda a: validate_attribute(a),normalized)
 
 # Returns a list of all normalized attributes
-def get_all_attributes(infobox):
-    return [normalize_attribute(a.name) for a in infobox.params]
+def get_all_attributes(infobox,raw=False):
+    if raw:
+        return [(normalize_attribute(a.name),a.name.strip()) for a in infobox.params]
+    else:
+        return [normalize_attribute(a.name) for a in infobox.params]
 
 def get_items(infobox):
     items = []

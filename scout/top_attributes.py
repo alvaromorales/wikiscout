@@ -17,29 +17,30 @@ class MRTopAttributes(MRJob):
         description = article['infobox']['description']
             
         if infobox_template != '' and infobox.validate_template(infobox_template) and description != []:
-            i = infobox.parse(infobox_template,description)
+            article_infobox = infobox.parse(infobox_template,description)
             
-            if i is None:
+            if article_infobox is None:
                 return
             
-            attributes = infobox.get_attributes(i)
+            attributes = infobox.get_attributes(article_infobox,raw=True)
             
-            for a in attributes:
-                yield infobox_template, (a,1)
+            for (a,raw) in attributes:
+                yield infobox_template, (a,raw,1)
                 
     def reducer(self, infobox_template, attribute_counts):
         attributes = {}
         
-        for (a,count) in attribute_counts:
+        for (a,raw,count) in attribute_counts:
             if a in attributes:
-                attributes[a] += count
+                attributes[a]['count'] += count
+                attributes[a]['raw'].add(raw)
             else:
-                attributes[a] = count
+                attributes[a] = { 'count': count, 'raw' : set([raw]) }
 
-        total = sum(attributes.itervalues())
+        total = sum([attributes[a]['count'] for a in attributes])
         t = int(total*0.05)
         
-        top_attributes = [a for a in attributes if attributes[a] >= t]
+        top_attributes = [{'attribute': a, 'raw': list(attributes[a]['raw'])} for a in attributes if attributes[a]['count'] >= t]
         
         if len(top_attributes) > 0:
             yield None, {'template': infobox_template, 'attributes': top_attributes}
