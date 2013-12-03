@@ -1,3 +1,4 @@
+import re
 from pyparsing import OneOrMore, nestedExpr
 import telnetlib
 
@@ -15,6 +16,21 @@ class Omnibase:
             print "Could not connect to Omnibase host %s"%self.host
             raise
     
+    def get(self,omnibase_class,symbol,attribute):
+        self.connect()
+
+        self.telnet.write('(get "%s" "%s"  "%s")'%(omnibase_class,symbol,attribute.upper()))
+        
+        response = self.telnet.read_all()
+        response = re.sub(r'\n','',response)
+
+        self.close()
+
+        if response.strip() == '#f':
+            return None
+
+        return list(eval(response.replace('" "','","')))
+
     def get_symbols(self,s,omnibase_class=None):
         self.connect()
 

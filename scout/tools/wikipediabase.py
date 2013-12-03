@@ -1,4 +1,5 @@
 from pyparsing import OneOrMore, nestedExpr
+import re
 import telnetlib
 
 class WikipediaBase:
@@ -26,6 +27,9 @@ class WikipediaBase:
     def parse_get_classes_response(self,response):
         if response.strip() == '#f':
             return []
+
+        response = re.sub(r'<!---.*?\"','\"',response)
+        response = re.sub(r'\n','',response)
 
         return map(lambda c: eval(c),response.strip()[1:-1].split(' '))
 
