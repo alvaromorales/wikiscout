@@ -14,7 +14,7 @@ class Annotation:
         self.sentence = sentence.decode('unicode-escape').encode('ascii','ignore')
 
         self.wiki_title = wiki_title
-        self.symbol = self.generate_symbol(template)
+
         self.template = template
         self.value = value.decode('unicode-escape').encode('ascii','ignore')
 
@@ -55,6 +55,7 @@ class Annotation:
             self.links = en_article['links']
 
         self.wb_classes = self.wb.get_classes(self.title)
+        self.symbol = self.generate_symbol(self.get_class(self.wb_classes))
         self.ob_symbols = self.filter_symbols(self.ob.get_known(self.sentence,omnibase_class='wikipedia-term'))
         
     @staticmethod
