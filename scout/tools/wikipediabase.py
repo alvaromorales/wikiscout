@@ -20,7 +20,12 @@ class WikipediaBase:
         self.connect()
         self.telnet.write('(get-classes "%s")\n'%s)
         response = self.telnet.read_all()
-        parsed_response = self.parse_get_classes_response(response)
+
+        try:
+            parsed_response = self.parse_get_classes_response(response)
+        except:
+            raise Exception('WikipediaBase could not parse: %s'%self.sentence)
+
         self.close()
         return parsed_response
     

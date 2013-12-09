@@ -1,3 +1,4 @@
+import json
 import re
 from pyparsing import OneOrMore, nestedExpr
 import telnetlib
@@ -18,7 +19,7 @@ class Omnibase:
     
     def get(self,omnibase_class,symbol,attribute):
         self.connect()
-
+        
         self.telnet.write('(get "%s" "%s"  "%s")'%(omnibase_class,symbol,attribute.upper()))
         
         response = self.telnet.read_all()
@@ -33,25 +34,32 @@ class Omnibase:
 
     def get_symbols(self,s,omnibase_class=None):
         self.connect()
+        s = json.dumps(s)
 
         if omnibase_class is not None:
-            self.telnet.write('(get-symbols "%s" \':class "%s")'%(s,omnibase_class))
+            self.telnet.write('(get-symbols %s \':class "%s")'%(s,omnibase_class))
         else:
-            self.telnet.write('(get-symbols "%s")'%s)
+            self.telnet.write('(get-symbols %s)'%s)
 
         response = self.telnet.read_all()
-        parsed_response = self.parse_get_symbols_response(response)
+
+        try:
+            parsed_response = self.parse_get_symbols_response(response)
+        except:
+            raise Exception('Omnibase could not parse: %s'%self.sentence)
+
         self.close()
         return parsed_response
 
     def get_known(self,s,omnibase_class=None):
         self.connect()
+        s = json.dumps(s)
 
         if omnibase_class is not None:
-            self.telnet.write('(get-known "%s" \':class "%s")'%(s,omnibase_class))
+            self.telnet.write('(get-known %s \':class "%s")'%(s,omnibase_class))
         else:
-            self.telnet.write('(get-known "%s")'%s)
-
+            self.telnet.write('(get-known %s)'%s)
+        
         response = self.telnet.read_all()
         parsed_response = self.parse_get_symbols_response(response)
         
@@ -61,7 +69,7 @@ class Omnibase:
     def parse_get_symbols_response(self,response):
         if response[:2] == '()':
             return None
-        
+
         # some responses are HUGE ... we truncate them
         
         if len(response) > 0 and response[-2:] != "))":
@@ -69,16 +77,16 @@ class Omnibase:
             response = response[:last_occurence + len(':priority 0)')] + ")"
         
         parsed_response = []
+
         try:
             data = self.scheme_parser.parseString(response)
         except:
-            print "Could not parse %s"%response
-            raise
+            raise Exception("Could not parse %s"%response)
 
         if data[0][0] == "error":
             print response
             raise Exception()
-
+        
         for d in data[0]:
             r = {}
             r['class'] = d[0]

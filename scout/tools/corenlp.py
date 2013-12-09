@@ -8,17 +8,34 @@ class CoreNLP:
         self.server = jsonrpclib.Server("http://%s:6888"%host)
         self.stopwords = set(stopwords.words('english'))
         self.punctuation = set(punctuation)
-        self.tagmap = {'LOCATION': 'any-wikipedia-location',
+        self.tagmap = {'LOCATION': 'any-c-s-c',
                        'TIME': 'any-time',
-                       'PERSON': 'any-wikipedia-person',
+                       'PERSON': 'any-person',
                        'ORGANIZATION': 'any-wikipedia-organization',
-                       'MONEY': 'any-money',
+                       'MONEY': 'any-currency',
                        'PERCENT': 'any-percent',
                        'DATE': 'any-date'
                        }
-
+    
     def parse(self,text):
         return loads(self.server.parse(text))
+
+    def normalize(self,word):
+        if word == '``' or word == "''":
+            return '"'
+        if word == '-LRB-':
+            return '('
+        if word == '-RRB-':
+            return ')'
+        if word == '-LSB-':
+            return '['
+        if word == '-RSB':
+            return ']'
+        if word == '-LCB-':
+            return '{'
+        if word == '-RCB-':
+            return '}'
+        return word
 
     def ner(self,text):
         parse = self.parse(text)
@@ -31,7 +48,7 @@ class CoreNLP:
         for sentence in parse['sentences']:
             if 'words' not in sentence:
                 continue
-
+            
             for word,attributes in sentence['words']:
                 if word in self.stopwords or word.startswith('any-wikipedia-'):
                     new_text.append(word)
@@ -46,8 +63,10 @@ class CoreNLP:
                                 continue
                         new_text.append(self.tagmap[tag])
                     else:
+                        word = self.normalize(word)
                         new_text.append(word)
                 else:
+                    word = self.normalize(word)
                     new_text.append(word)
         
         return ''.join(w if set(w) <= self.punctuation or w == "'s" else ' '+w for w in new_text).lstrip()

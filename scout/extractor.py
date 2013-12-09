@@ -44,8 +44,6 @@ class MRExtractor(MRJob):
         if infobox_type not in self.top_attributes:
             return
 
-        links = en_article['links'] + simple_article['links']
-        highlights = list(set(en_article['highlights']).union(set(simple_article['highlights'])))
         matching_attributes = {}
         
         for attribute, value in infobox.get_items(article_infobox):
@@ -84,9 +82,9 @@ class MRExtractor(MRJob):
             for c in candidate_group:
                 candidate_sentences['sentences'].append(c)
 
-        if len(candidate_sentences['sentences']) > 1:
+        if len(candidate_sentences['sentences']) > 0:
             yield infobox_type, candidate_sentences
-
+    
     def mapper_infobox_type(self,infobox_type,candidates):
         yield infobox_type,candidates
 
