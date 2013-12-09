@@ -1,0 +1,4 @@
+mwparserfromhell==0.3.2
+Twisted==13.2.0
+dewiki==0.1.0
+pymongo==2.6.3
