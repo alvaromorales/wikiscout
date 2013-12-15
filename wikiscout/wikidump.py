@@ -36,7 +36,7 @@ class WikiDump:
         
         if article is not None:
             title = article['title'].decode('utf-8').encode('ascii','ignore')
-            template = None
+            wiki_class = None
             if 'infobox' in article:
                 wiki_class = infobox.get_class(article['infobox']['name']).decode('utf-8').encode('ascii','ignore')
             return (title,wiki_class)
