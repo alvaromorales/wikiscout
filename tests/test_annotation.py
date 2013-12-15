@@ -1,5 +1,5 @@
 import unittest
-from scout.tools.annotation import Annotation
+from wikiscout.annotation import Annotation
 
 class TestGenerateSymbol(unittest.TestCase):
     def test_infobox_template(self):

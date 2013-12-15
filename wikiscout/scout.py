@@ -1,9 +1,10 @@
 import logging
 import json
-from tools.annotation import Annotation
-from tools.start import START
-from tools import schemata
-from tools import infobox
+
+from annotation import Annotation
+from start import START
+import schemata
+import infobox
 
 class Scout:
     def __init__(self,attributes_file,candidates_file,output_file):
@@ -73,6 +74,10 @@ class Scout:
                     total += 1
                     schema = self.eval_candidate(template,attribute,sentence,value,wiki_title,index)
                     if schema is not None:
-                        self.outf.write(schema)
-                        index += 1
+                        try:
+                            self.outf.write(schema)
+                            index += 1
+                        except Exception as e:
+                            logging.error('Could not write schema for article %s, attribute %s and value %s'%(wiki_title,attribute,value))
+                                                        
         return index,total

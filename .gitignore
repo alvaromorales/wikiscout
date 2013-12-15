@@ -54,9 +54,3 @@ nosetests.xml
 
 # Rope
 .ropeproject
-
-# data directories
-
-data
-results
-scout/tools.tar

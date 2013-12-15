@@ -1,5 +1,5 @@
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
-from kb import WikiKB
+from wikiscout.wikikb import WikiKB
 
 def get(wiki_class,title,attribute):
     w = WikiKB('nauru')

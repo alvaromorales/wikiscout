@@ -1,5 +1,5 @@
 import unittest
-from scout.tools import sentence_tools
+from wikiscout import sentence_tools
 
 class TestValidate(unittest.TestCase):
     def test_invalid_period(self):

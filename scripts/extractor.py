@@ -6,8 +6,8 @@ import mrjob.util
 from mrjob.protocol import JSONValueProtocol
 from mrjob.job import MRJob
 
-from tools import infobox
-from tools import sentence_tools
+from start import infobox
+from start import sentence_tools
 
 class MRExtractor(MRJob):
     INPUT_PROTOCOL = JSONValueProtocol
