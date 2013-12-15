@@ -1,9 +1,10 @@
 import unittest
-from wikiscout.wikikb import WikiKB, Infobox
+from wikiscout.wikikb import WikiKB
+import wikiscout.infobox as infobox
 
 class TestInfobox(unittest.TestCase):
     def test_cls(self):
-        self.assertEqual('wikipedia-president', Infobox.get_cls(' Infobox president  \n'))
+        self.assertEqual('wikipedia-president', infobox.get_class(' Infobox president  \n'))
 
 class TestGetClasses(unittest.TestCase):
     @classmethod
@@ -30,13 +31,13 @@ class TestGetAttributes(unittest.TestCase):
         self.assertEquals([],self._kb.get_attributes('wikipedia-officeholder','Peru'))
         
     def test_officeholder(self):
-        expected = [u'NAME', u'IMAGE', u'ALT', u'ORDER', u'OFFICE', u'VICEPRESIDENT', u'TERM-START', u'PREDECESSOR', u'STATE2', u'TERM-START2', u'TERM-END2', u'PREDECESSOR2', u'SUCCESSOR2', u'OFFICE3', u'TERM-START3', u'TERM-END3', u'PREDECESSOR3', u'SUCCESSOR3', u'BIRTH-NAME', u'BIRTH-DATE', u'BIRTH-PLACE', u'PARTY', u'SPOUSE', u'CHILDREN', u'RESIDENCE', u'ALMA-MATER', u'PROFESSION', u'RELIGION', u'BLANK1', u'DATA1', u'SIGNATURE', u'SIGNATURE-ALT', u'WEBSITE']
+        expected = [u'NAME', u'IMAGE', u'ALT', u'ORDER', u'OFFICE', u'VICEPRESIDENT', u'TERM-START', u'PREDECESSOR', u'STATE2', u'TERM-START2', u'TERM-END2', u'PREDECESSOR2', u'SUCCESSOR2', u'OFFICE3', u'TERM-START3', u'TERM-END3', u'PREDECESSOR3', u'SUCCESSOR3', u'BIRTH-NAME', u'BIRTH-DATE', u'BIRTH-PLACE', u'PARTY', u'SPOUSE', u'CHILDREN', u'RESIDENCE', u'ALMA-MATER', u'PROFESSION', u'RELIGION', u'BLANK1', u'DATA1', u'SIGNATURE', u'SIGNATURE-ALT', u'WEBSITE',u'JR/SR2']
         self.assertItemsEqual(expected,self._kb.get_attributes('wikipedia-officeholder','Barack Obama'))
-
+    
     def test_person(self):
         expected = [u'NAME', u'IMAGE', u'IMAGE-SIZE', u'ALT', u'CAPTION', u'BIRTH-NAME', u'BIRTH-DATE', u'BIRTH-PLACE', u'RESIDENCE', u'ALMA-MATER', u'OCCUPATION', u'YEARS-ACTIVE', u'NET-WORTH', u'BOARDS', u'RELIGION', u'SPOUSE', u'CHILDREN', u'PARENTS', u'SIGNATURE', u'SIGNATURE-ALT', u'WEBSITE']
         self.assertItemsEqual(expected,self._kb.get_attributes('wikipedia-person','Bill Gates'))
-
+    
     def test_president(self):
         expected = [u'NAME', u'IMAGE', u'ORDER', u'OFFICE', u'VICEPRESIDENT', u'TERM-START', u'TERM-END', u'PREDECESSOR', u'SUCCESSOR', u'ORDER1', u'OFFICE1', u'LIEUTENANT1', u'TERM-START1', u'TERM-END1', u'PREDECESSOR1', u'SUCCESSOR1', u'LIEUTENANT2', u'TERM-START2', u'TERM-END2', u'PREDECESSOR2', u'SUCCESSOR2', u'ORDER3', u'OFFICE3', u'GOVERNOR3', u'TERM-START3', u'TERM-END3', u'PREDECESSOR3', u'SUCCESSOR3', u'BIRTH-NAME', u'BIRTH-DATE', u'BIRTH-PLACE', u'DEATH-DATE', u'DEATH-PLACE', u'PARTY', u'SPOUSE', u'CHILDREN', u'ALMA-MATER', u'RELIGION', u'SIGNATURE', u'SIGNATURE-ALT', u'WEBSITE']
         self.assertItemsEqual(expected,self._kb.get_attributes('wikipedia-president','Bill Clinton'))

@@ -7,7 +7,7 @@ from mrjob.protocol import JSONValueProtocol
 from mrjob.job import MRJob
 
 from start import infobox
-from start import sentence_tools
+from start import sentence
 
 class MRExtractor(MRJob):
     INPUT_PROTOCOL = JSONValueProtocol
@@ -50,7 +50,7 @@ class MRExtractor(MRJob):
             if attribute in self.top_attributes[infobox_type] and attribute not in infobox.ignore_attributes:
                 matching_attributes[attribute] = value
 
-        simple_sentences = sentence_tools.get(simple_article['paragraphs'])
+        simple_sentences = sentence.get(simple_article['paragraphs'])
         candidate_sentences = {}
 
         for attribute,value in matching_attributes.items():
@@ -59,7 +59,7 @@ class MRExtractor(MRJob):
                 continue
 
             for s in simple_sentences:
-                if sentence_tools.has_value(s,value):
+                if sentence.has_value(s,value):
                     attribute_matches.append({'sentence':s,'value':value,'wikiTitle':title})
 
             if attribute not in candidate_sentences:
