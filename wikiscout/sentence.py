@@ -1,7 +1,9 @@
 import re
 from nltk.tokenize import sent_tokenize
 
-def has_value(s,value):
+def has_value(sentence,value):
+    """Checks if a sentence contains a value."""
+    
     return re.search(r'\b%s\b'%re.escape(value),s) is not None
 
 def validate(sentence):
@@ -15,6 +17,8 @@ def normalize(sentence):
     return sentence
 
 def get(paragraphs):
+    """Gets valid sentences from paragraphs."""
+    
     paragraphs = filter(lambda p: validate(p), paragraphs)
     paragraphs = [normalize(p) for p in paragraphs]
 

@@ -16,19 +16,9 @@ def define(symbol,wiki_class,index=6,already_defined=False):
     
     return '\n'.join(definition)
 
-def normalize(attributes):
-    attrs = set()
-    for a in attributes:
-        a = a.lower().strip()
-        a = re.sub('_+','-',a)
-        a = re.sub(r'\n+','',a)
-        a = re.sub(r'[ ]+','-',a)
-        attrs.add(a)
-    return list(attrs)
-
 def generate(annotation,index,wiki_class,attributes):
     annotation = json.dumps(annotation)
-    attrs = symbol_list(normalize(attributes))
+    attrs = symbol_list(attributes)
 
     return """
 (def-schema 'wikiscout-%s
