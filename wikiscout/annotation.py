@@ -23,7 +23,7 @@ def replace_title(title, symbol, tokenization):
     return ok
 
 
-def replace_pronoun(symbol, tokenization):
+def replace_pronoun(object, symbol, tokenization):
     token = tokenization.tokens[0]
 
     if token.value in ['He', 'She', 'It', 'They']:
@@ -37,7 +37,11 @@ def replace_pronoun(symbol, tokenization):
     return False
 
 
-def replace_synonyms(synonyms, symbol, tokenization):
+def replace_synonyms(object, symbol, tokenization):
+    synonyms = wikikb.get_synonyms(object)
+    if synonyms is None:
+        return False
+
     ok = False
     for i, token in enumerate(tokenization.tokens):
         for s in synonyms:
@@ -55,10 +59,9 @@ def replace_synonyms(synonyms, symbol, tokenization):
 
 def replace_object(object, symbol, tokenization):
     ok = replace_title(object, symbol, tokenization)
-    if not ok:
-        ok = ok or replace_pronoun(symbol, tokenization)
+    for f in [replace_pronoun, replace_synonyms]:
+        if ok:
+            break
+        ok = f(object, symbol, tokenization)
 
-        if not ok:
-            synonyms = wikikb.get_synonyms(object)
-            ok = ok or replace_synonyms(synonyms, symbol, tokenization)
     return ok
