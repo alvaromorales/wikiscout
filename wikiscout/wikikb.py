@@ -95,7 +95,7 @@ def get_classes(title):
 
 
 def get_synonyms(title):
-    """Gets an article's synonyms
+    """Gets an article's synonyms.
 
     Args:
       title (str): The article title.
@@ -104,4 +104,17 @@ def get_synonyms(title):
     synonyms = db.synonyms.find_one({'title': title})
     if synonyms is not None:
         return synonyms['synonyms']
+    return None
+
+
+def get_synonym_title(synonym):
+    """Gets an article's title given a synonym.
+
+    Args:
+      synonym (str): A synonym of the article's title.
+    """
+    client, db = _connect()
+    title = db.inverted_synonyms.find_one({'synonym': synonym})
+    if title is not None:
+        return title['title']
     return None
