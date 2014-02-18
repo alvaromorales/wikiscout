@@ -2,6 +2,7 @@ import re
 import logging
 import wikikb
 import tokenize
+from nltk.corpus import stopwords
 
 logger = logging.getLogger(__name__)
 
@@ -80,27 +81,41 @@ def replace_object(object, symbol, tokenization):
 def replace_proper_nouns(tokenization):
     ok = False
     for i, t in enumerate(tokenization.tokens):
-        if not t.value[0].isupper():
+        if not t.value[0].isupper() or t.value.lower() in \
+                stopwords.words('english'):
             continue
 
         possesive = re.search(r'(.*?)\'s$', t.value)
         if possesive:
             noun = possesive.group(1)
-            title = wikikb.get_synonym_title(noun)
-            if title:
-                cls = wikikb.get_class(title)
-                if cls:
-                    tokenization.tokens[i] = tokenization.replace_token(
-                        t, 'any-%s\'s' % cls)
-                    ok = True
+
+            cls = wikikb.get_class(noun)
+            if cls:
+                tokenization.tokens[i] = tokenization.replace_token(
+                    t, 'any-%s\'s' % cls)
+                ok = True
+            else:
+                title = wikikb.get_synonym_title(noun)
+                if title:
+                    cls = wikikb.get_class(title)
+                    if cls:
+                        tokenization.tokens[i] = tokenization.replace_token(
+                            t, 'any-%s\'s' % cls)
+                        ok = True
         else:
-            title = wikikb.get_synonym_title(t.value)
-            if title:
-                cls = wikikb.get_class(title)
-                if cls:
-                    tokenization.tokens[i] = tokenization.replace_token(
-                        t, 'any-%s' % cls)
-                    ok = False
+            cls = wikikb.get_class(t.value)
+            if cls:
+                tokenization.tokens[i] = tokenization.replace_token(
+                    t, 'any-%s' % cls)
+                ok = True
+            else:
+                title = wikikb.get_synonym_title(t.value)
+                if title:
+                    cls = wikikb.get_class(title)
+                    if cls:
+                        tokenization.tokens[i] = tokenization.replace_token(
+                            t, 'any-%s' % cls)
+                        ok = True
 
     return ok
 
@@ -113,6 +128,7 @@ def annotate(sentence, object):
 
     symbol = 'any-%s' % cls
     tokenization = tokenize.tokenize(sentence)[0]
+    logger.debug('Tokenization: %s' % tokenization.tokens)
 
     if replace_object(object, symbol, tokenization):
         replace_proper_nouns(tokenization)
