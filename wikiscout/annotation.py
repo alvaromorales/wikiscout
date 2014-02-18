@@ -1,13 +1,20 @@
 import re
 import logging
 import wikikb
-from tokenize import tokenize
+import tokenize
 
 logger = logging.getLogger(__name__)
-USE_TERM = True
+
+
+class ObjectNotFoundException(Exception):
+    pass
+
+
+class ObjectSymbolNotFoundException(Exception):
+    pass
+
 
 # Annotation Generation methods
-
 
 def replace_title(title, symbol, tokenization):
     title_possesive = title + '\'s'
@@ -33,7 +40,8 @@ def replace_pronoun(object, symbol, tokenization):
         return True
 
     if token.value in ['His', 'Her', 'Its', 'Their']:
-        tokenization.tokens[0] = tokenization.replace_token(token, symbol + '\'s')
+        tokenization.tokens[0] = tokenization.replace_token(token,
+                                                            symbol + '\'s')
         return True
 
     return False
@@ -68,6 +76,7 @@ def replace_object(object, symbol, tokenization):
 
     return ok
 
+
 def replace_proper_nouns(tokenization):
     ok = False
     for i, t in enumerate(tokenization.tokens):
@@ -95,3 +104,19 @@ def replace_proper_nouns(tokenization):
 
     return ok
 
+
+def annotate(sentence, object):
+    cls = wikikb.get_class(object)
+    if not cls:
+        raise ObjectSymbolNotFoundException(
+            "Could not generate a matching symbol for object \"%s\"" % object)
+
+    symbol = 'any-%s' % cls
+    tokenization = tokenize.tokenize(sentence)[0]
+
+    if replace_object(object, symbol, tokenization):
+        replace_proper_nouns(tokenization)
+        return tokenization
+    else:
+        raise ObjectNotFoundException("Could not find object \"%s\" in \"%s\""
+                                      % (object, sentence))
