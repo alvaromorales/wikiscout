@@ -1,6 +1,8 @@
 import re
 import logging
 import wikikb
+import omnibase
+import wikipediabase
 import tokenize
 from nltk.corpus import stopwords
 
@@ -48,9 +50,24 @@ def replace_pronoun(object, symbol, tokenization):
     return False
 
 
+# TODO temp solution
+# make more efficient by removing external calls
+def get_person_synonyms(object):
+    classes = wikipediabase.get_classes(object, host='tonga')
+    if classes and 'wikipedia-person' in classes:
+        return omnibase.get('nobel-person', object, 'SYNONYMS', host='tonga')
+    return []
+
+
 def replace_synonyms(object, symbol, tokenization):
-    synonyms = wikikb.get_synonyms(object)
-    if synonyms is None:
+    synonyms = []
+    wiki_synonyms = wikikb.get_synonyms(object)
+    if wiki_synonyms:
+        synonyms.extend(wiki_synonyms)
+
+    synonyms.extend(get_person_synonyms(object))
+
+    if len(synonyms) == 0:
         return False
 
     ok = False

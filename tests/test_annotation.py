@@ -49,15 +49,13 @@ class TestObject(unittest.TestCase):
         self.helper(annotation.replace_pronoun, sentence,
                     object, symbol, expected)
 
-    # TODO
     def test_replace_person_synonym(self):
         sentence = 'Clinton married Hillary Rodham'
         object = 'Bill Clinton'
         symbol = 'any-wikipedia-president'
         expected = 'any-wikipedia-president married Hillary Rodham'
-        #self.helper(annotation.replace_synonyms, sentence,
-        #            object, symbol, expected)
-        pass
+        self.helper(annotation.replace_synonyms, sentence,
+                    object, symbol, expected)
 
     def test_replace_synonym(self):
         sentence = 'William Clinton married Hillary Rodham'
