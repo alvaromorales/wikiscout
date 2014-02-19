@@ -88,7 +88,6 @@ def replace_proper_nouns(tokenization):
         possesive = re.search(r'(.*?)\'s$', t.value)
         if possesive:
             noun = possesive.group(1)
-
             cls = wikikb.get_class(noun)
             if cls:
                 tokenization.tokens[i] = tokenization.replace_token(
@@ -102,6 +101,10 @@ def replace_proper_nouns(tokenization):
                         tokenization.tokens[i] = tokenization.replace_token(
                             t, 'any-%s\'s' % cls)
                         ok = True
+                    else:
+                        logging.debug('Could not find a matching symbol for %s' % t)
+                else:
+                    logging.debug('Could not find a matching symbol for %s' % t)
         else:
             cls = wikikb.get_class(t.value)
             if cls:
@@ -116,6 +119,10 @@ def replace_proper_nouns(tokenization):
                         tokenization.tokens[i] = tokenization.replace_token(
                             t, 'any-%s' % cls)
                         ok = True
+                    else:
+                        logging.debug('Could not find a matching symbol for %s' % t)
+                else:
+                    logging.debug('Could not find a matching symbol for %s' % t)
 
     return ok
 
@@ -128,7 +135,7 @@ def annotate(sentence, object):
 
     symbol = 'any-%s' % cls
     tokenization = tokenize.tokenize(sentence)[0]
-    logger.debug('Tokenization: %s' % tokenization.tokens)
+    logger.info('Tokenized as %s' % tokenization.tokens)
 
     if replace_object(object, symbol, tokenization):
         replace_proper_nouns(tokenization)

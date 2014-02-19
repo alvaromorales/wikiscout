@@ -32,4 +32,7 @@ class Tokenization:
 def tokenize(sentence):
     response = start.tokenize(sentence)
     tokenizations = response['tokenizations']['tokenization']
-    return [Tokenization(t) for t in tokenizations]
+    if type(tokenizations) is list:
+        return [Tokenization(t) for t in tokenizations]
+    else:
+        return [Tokenization(tokenizations)]
