@@ -95,7 +95,7 @@ def replace_object(object, symbol, tokenization):
     return ok
 
 
-def replace_proper_nouns(tokenization):
+def replace_proper_nouns(object, tokenization):
     ok = False
     for i, t in enumerate(tokenization.tokens):
         if not t.value[0].isupper() or t.value.lower() in \
@@ -111,7 +111,7 @@ def replace_proper_nouns(tokenization):
                     t, 'any-%s\'s' % cls)
                 ok = True
             else:
-                title = wikikb.get_synonym_title(noun)
+                title = wikikb.get_synonym_title(noun, object)
                 if title:
                     cls = wikikb.get_class(title)
                     if cls:
@@ -129,7 +129,7 @@ def replace_proper_nouns(tokenization):
                     t, 'any-%s' % cls)
                 ok = True
             else:
-                title = wikikb.get_synonym_title(t.value)
+                title = wikikb.get_synonym_title(t.value, object)
                 if title:
                     cls = wikikb.get_class(title)
                     if cls:
@@ -155,7 +155,7 @@ def annotate(sentence, object):
     logger.info('Tokenized as %s' % tokenization.tokens)
 
     if replace_object(object, symbol, tokenization):
-        replace_proper_nouns(tokenization)
+        replace_proper_nouns(object, tokenization)
         return tokenization
     else:
         raise ObjectNotFoundException("Could not find object \"%s\" in \"%s\""

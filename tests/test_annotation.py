@@ -76,26 +76,38 @@ class TestObject(unittest.TestCase):
 
 class TestProperNouns(unittest.TestCase):
     def test_replace_title(self):
+        object = 'Bill Clinton'
         sentence = 'Bill Clinton married Hillary Rodham'
         expected = 'any-wikipedia-president married any-wikipedia-officeholder'
         tokenization = tokenize.tokenize(sentence)[0]
-        annotation.replace_proper_nouns(tokenization)
+        annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
 
     def test_replace_possesive(self):
+        object = 'Bill Clinton'
         sentence = 'Hillary Clinton\'s husband is Bill Clinton'
         expected = 'any-wikipedia-officeholder\'s husband is any-wikipedia-president'
         tokenization = tokenize.tokenize(sentence)[0]
-        annotation.replace_proper_nouns(tokenization)
+        annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
 
     def test_replace_synonyms(self):
+        object = 'Mark Zuckerberg'
         sentence = 'Zuck dropped out of Harvard University to start Facebook'
         expected = 'any-wikipedia-person dropped out of any-wikipedia-us-university-ranking to start any-wikipedia-dot-com-company'
         tokenization = tokenize.tokenize(sentence)[0]
-        annotation.replace_proper_nouns(tokenization)
+        annotation.replace_proper_nouns(object, tokenization)
+        actual = tokenization.join_tokens()
+        self.assertEquals(actual, expected)
+
+    def test_shortest_path(self):
+        object = 'Bill Gates'
+        sentence = 'Bill Gates studied at Harvard'
+        expected = 'any-wikipedia-person studied at any-wikipedia-us-university-ranking'
+        tokenization = tokenize.tokenize(sentence)[0]
+        annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
 
