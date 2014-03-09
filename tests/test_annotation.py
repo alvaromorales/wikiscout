@@ -96,7 +96,7 @@ class TestProperNouns(unittest.TestCase):
     def test_replace_synonyms(self):
         object = 'Mark Zuckerberg'
         sentence = 'Zuck dropped out of Harvard University to start Facebook'
-        expected = 'any-wikipedia-person dropped out of any-wikipedia-us-university-ranking to start any-wikipedia-dot-com-company'
+        expected = 'any-wikipedia-person dropped out of any-wikipedia-university to start any-wikipedia-dot-com-company'
         tokenization = tokenize.tokenize(sentence)[0]
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
@@ -105,7 +105,7 @@ class TestProperNouns(unittest.TestCase):
     def test_shortest_path(self):
         object = 'Bill Gates'
         sentence = 'Bill Gates studied at Harvard'
-        expected = 'any-wikipedia-person studied at any-wikipedia-us-university-ranking'
+        expected = 'any-wikipedia-person studied at any-wikipedia-university'
         tokenization = tokenize.tokenize(sentence)[0]
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
