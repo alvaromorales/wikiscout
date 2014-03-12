@@ -1,12 +1,9 @@
-from py2neo import neo4j
+import re
 from pymongo import MongoClient
 import logging
 import infobox
 
 logger = logging.getLogger(__name__)
-
-py2neo_log = logging.getLogger('py2neo')
-py2neo_log.setLevel(logging.WARNING)
 
 
 def _connect(host='localhost'):
@@ -15,10 +12,6 @@ def _connect(host='localhost'):
     client = MongoClient(host, 27017)
     db = client.wiki
     return (client, db)
-
-
-def _connect_wikigraph():
-    return neo4j.GraphDatabaseService()
 
 
 def get_article(title, fields=None, lang='en'):
@@ -50,7 +43,11 @@ def get_article(title, fields=None, lang='en'):
         return None
 
     while article is not None and 'redirect' in article:
-        article = db.wikipedia.find_one({'title': article['redirect']})
+        if fields:
+            article = db.wikipedia.find_one({'title': article['redirect']},
+                                            fields=fields)
+        else:
+            article = db.wikipedia.find_one({'title': article['redirect']})
 
     return article
 
@@ -97,6 +94,7 @@ def get_attributes(cls, title):
       title (str): The title of the article.
     """
     article_infoboxes = get_infoboxes(title)
+
     for article_infobox in article_infoboxes:
         if article_infobox and article_infobox.name == cls:
             return article_infobox.get_all_attributes()
@@ -149,29 +147,22 @@ def get_synonyms(title):
     return None
 
 
-def shortest_path_length(t1, t2):
-    graph_db = _connect_wikigraph()
+def pick_best_link(matching_links, article_links):
+    def clean_id(id):
+        return re.match(r'^(.+?)(?:#.*)?$', id.lower()).group(1)
 
-    query_string = """MATCH (p0:Page {title:'%s'}), (p1:Page {title:'%s'}),
-                        p = shortestPath((p0)-[*..6]-(p1))
-                      RETURN p""" % (t1, t2)
+    for i, matching_link in enumerate(matching_links):
+        for article_link in article_links:
+            if i == 0:
+                default = matching_link['title']
 
-    result = neo4j.CypherQuery(graph_db, query_string).execute()
-    path_lengths = [len(r.p) for r in result]
-    if len(path_lengths) > 0:
-        return min(path_lengths)
-    else:
-        return float('inf')
+            if clean_id(article_link['id']) == clean_id(matching_link['wikiTitle']):
+                title = matching_link['title']
+                logger.debug('Picked "%s" as best link' % title)
+                return title
 
-
-def pick_best_link(links, object):
-    spaths = []
-    for l in links:
-        spaths.append((l['title'], shortest_path_length(object, l['title'])))
-
-    link = min(spaths, key=lambda x: x[1])[0]
-    logger.debug("Picked %s out of %s" % (link, spaths))
-    return link
+    logger.debug('Could not pick best link. Returned first: "%s"' % default)
+    return default
 
 
 def get_synonym_title(synonym, object):
@@ -181,11 +172,12 @@ def get_synonym_title(synonym, object):
       synonym (str): A synonym of the article's title.
     """
     client, db = _connect()
-    titles = db.inverted_synonyms.find({'synonym': synonym})
-    if titles.count() != 0:
-        if titles.count() == 1:
-            return titles[0]['title']
+    matching_links = db.inverted_synonyms.find({'synonym': synonym})
+    article_links = get_article(object, fields={'links': 1})['links']
+    if matching_links.count() != 0:
+        if matching_links.count() == 1:
+            return matching_links[0]['title']
 
-        return pick_best_link(titles, object)
+        return pick_best_link(matching_links, article_links)
 
     return None
