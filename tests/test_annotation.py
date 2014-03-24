@@ -25,7 +25,7 @@ class TestObject(unittest.TestCase):
         self.helper(annotation.replace_title, sentence,
                     object, symbol, expected)
 
-    def test_replace_possesive_title(self):
+    def test_replace_possessive_title(self):
         sentence = 'Bill Clinton\'s wife is Hillary Rodham'
         object = 'Bill Clinton'
         symbol = 'any-wikipedia-president'
@@ -41,7 +41,7 @@ class TestObject(unittest.TestCase):
         self.helper(annotation.replace_pronoun, sentence,
                     object, symbol, expected)
 
-    def test_replace_possesive_pronoun(self):
+    def test_replace_possessive_pronoun(self):
         sentence = 'His wife is Hillary Rodham'
         object = 'Bill Clinton'
         symbol = 'any-wikipedia-president'
@@ -65,7 +65,7 @@ class TestObject(unittest.TestCase):
         self.helper(annotation.replace_synonyms, sentence,
                     object, symbol, expected)
 
-    def test_replace_possesive_synonym(self):
+    def test_replace_possessive_synonym(self):
         sentence = 'William Clinton\'s wife is Hillary Rodham'
         object = 'Bill Clinton'
         symbol = 'any-wikipedia-president'
@@ -84,7 +84,7 @@ class TestProperNouns(unittest.TestCase):
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
 
-    def test_replace_possesive(self):
+    def test_replace_possessive(self):
         object = 'Bill Clinton'
         sentence = 'Hillary Clinton\'s husband is Bill Clinton'
         expected = 'any-wikipedia-officeholder\'s husband is any-wikipedia-president'
@@ -131,3 +131,26 @@ class TestAnnotate(unittest.TestCase):
         object = 'WrongOBJECT'
         self.assertRaises(annotation.ObjectSymbolNotFoundException,
                           annotation.annotate, sentence, object)
+
+
+class TestIndexSymbols(unittest.TestCase):
+    def test_index(self):
+        sentence = 'Brad Pitt married Angelina Jolie'
+        object = 'Brad Pitt'
+        expected = 'any-wikipedia-person-one married any-wikipedia-person-two'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_multiple_indexes(self):
+        sentence = 'Brad Pitt married Angelina Jolie after Brad Pitt and Angelina Jolie filmed a movie together'
+        object = 'Brad Pitt'
+        expected = 'any-wikipedia-person-one married any-wikipedia-person-two after any-wikipedia-person-one and any-wikipedia-person-two filmed a movie together'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_possessive_index(self):
+        sentence = 'Brad Pitt\'s wife is Angelina Jolie'
+        object = 'Brad Pitt'
+        expected = 'any-wikipedia-person-one\'s wife is any-wikipedia-person-two'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
