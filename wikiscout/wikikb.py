@@ -2,6 +2,8 @@ import re
 from pymongo import MongoClient
 import logging
 import infobox
+import omnibase
+import wikipediabase
 
 logger = logging.getLogger(__name__)
 
@@ -142,8 +144,14 @@ def get_synonyms(title):
     """
     client, db = _connect()
     synonyms = db.synonyms.find_one({'title': title})
+
     if synonyms is not None:
-        return synonyms['synonyms']
+        # TODO remove external calls
+        synonyms = synonyms['synonyms']
+        classes = wikipediabase.get_classes(title, host='tonga')
+        if classes and 'wikipedia-person' in classes:
+            synonyms.extend(omnibase.get('nobel-person', title, 'SYNONYMS', host='tonga'))
+        return synonyms
     return None
 
 
