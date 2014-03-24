@@ -60,6 +60,7 @@ class Infobox:
         
         infobox = mwparserfromhell.parse(infobox_text)
         templates = infobox.filter_templates()
+        self.wiki_class = wiki_class
         
         if len(templates) > 0:
             self.infobox = templates[0]
@@ -98,7 +99,7 @@ class Infobox:
         items = {}
         for p in self.infobox.params:
             attribute = normalize_attribute(p.name)
-            value = DewikiParser().parse_string(p.value.strip())
+            value = DewikiParser().parse_string(p.value.strip()).strip()
 
             if validate_attribute(attribute) and validate_value(value):
                 items[attribute] = value
