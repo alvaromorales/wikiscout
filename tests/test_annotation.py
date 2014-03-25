@@ -154,3 +154,26 @@ class TestIndexSymbols(unittest.TestCase):
         expected = 'any-wikipedia-person-one\'s wife is any-wikipedia-person-two'
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
+
+
+class TestTagDates(unittest.TestCase):
+    def test_simple(self):
+        sentence = 'Tom Brady signed with the Patriots in 2000 and moved to Boston'
+        object = 'Tom Brady'
+        expected = 'any-wikipedia-nfl-player signed with the any-wikipedia-nfl-team in any-date and moved to any-wikipedia-settlement'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_multiple(self):
+        sentence = 'Clinton served as governor of Arkansas from 1979 to 1981 and again from 1983 to 1993'
+        object = 'Bill Clinton'
+        expected = 'any-wikipedia-president served as governor of any-wikipedia-u.s.-state from any-date-one to any-date-two and again from any-date-three to any-date-four'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_no_dates(self):
+        sentence = 'It is split in 3 parts'
+        object = 'The Lord of the Rings'
+        expected = 'any-wikipedia-novel-series is split in 3 parts'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)

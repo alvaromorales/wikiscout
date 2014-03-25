@@ -1,5 +1,6 @@
 import start
 import logging
+import corenlp
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +10,6 @@ numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
            11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen',
            15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen',
            19: 'nineteen', 20: 'twenty'}
-
 
 class Token:
     def __init__(self, value):
@@ -71,7 +71,9 @@ class Tokenization:
             else:
                 tokens.append(token.value)
 
-        return " ".join(tokens)
+        annotation = " ".join(tokens)
+        annotation = corenlp.ner(annotation)
+        return annotation
 
     def __str__(self):
         return "Tokenization(%s)" % ([t.value for t in self.tokens])
