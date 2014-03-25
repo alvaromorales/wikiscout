@@ -1,5 +1,6 @@
 import re
 from nltk.tokenize import sent_tokenize
+from unidecode import unidecode
 
 
 def has_value(sentence, value):
@@ -29,6 +30,7 @@ def validate(sentence):
 
 def normalize(sentence):
     sentence = re.sub('(?i)TEMPLATE\[.*?\]','',sentence)
+    sentence = unidecode(sentence)
     sentence = sentence.strip()
     return sentence
 
