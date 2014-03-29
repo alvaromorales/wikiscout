@@ -157,6 +157,8 @@ def get_synonyms(title):
 
 def pick_best_link(matching_links, article_links):
     def clean_id(id):
+        if id is None:
+            return None
         return re.match(r'^(.+?)(?:#.*)?$', id.lower()).group(1)
 
     for i, matching_link in enumerate(matching_links):
