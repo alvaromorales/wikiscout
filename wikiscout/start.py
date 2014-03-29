@@ -9,6 +9,10 @@ class STARTParseResponseException(Exception):
     pass
 
 
+class STARTServerException(Exception):
+    pass
+
+
 def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
     params = {'query': query,
               'referrer': 'http://start.csail.mit/wikiscout',
@@ -22,13 +26,16 @@ def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
               'fg': 'yes'
               }
 
-    r = requests.get('http://start.csail.mit.edu/askstart.cgi',
-                     params=params)
+    r = requests.post('http://start.csail.mit.edu/askstart.cgi',
+                     data=params)
+
+    if '<h1>Internal Server Error</h1>' in r.text:
+        raise STARTServerException(r.text)
 
     try:
         response = xmltodict.parse(r.text)
     except:
-        raise STARTParseResponseException('Could not parse: %s' % r.text)
+        raise STARTParseResponseException('Could not parse START response.\nAction=%s, Query= "%s".\nResponse: %s' % (action, query, r.text[:250]))
 
     return response
 
