@@ -177,3 +177,19 @@ class TestTagDates(unittest.TestCase):
         expected = 'any-wikipedia-novel-series is split in 3 parts'
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
+
+
+class TestCommaReplacements(unittest.TestCase):
+    def test_single(self):
+        sentence = 'He was born in Hibbing, Minnesota.'
+        object = 'Chi Chi LaRue'
+        expected = 'any-wikipedia-adult-biography was born in any-wikipedia-settlement'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_multiple(self):
+        sentence = 'US Airways runs many flights from Charlotte, North Carolina, Philadelphia, Pennsylvania and Phoenix, Arizona.'
+        object = 'US Airways'
+        expected = 'any-wikipedia-airline runs many flights from any-wikipedia-settlement-one any-wikipedia-settlement-two and any-wikipedia-settlement-three'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
