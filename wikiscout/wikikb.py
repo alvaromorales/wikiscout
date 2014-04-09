@@ -1,7 +1,7 @@
 import re
 from pymongo import MongoClient
 import logging
-import infobox
+from infobox_parser import Infobox
 import omnibase
 import wikipediabase
 
@@ -67,7 +67,7 @@ def get_infoboxes(title, lang='en'):
     if article is None or 'infoboxes' not in article:
         return None
 
-    infoboxes = [infobox.Infobox(i) for i in article['infoboxes']]
+    infoboxes = [Infobox(i) for i in article['infoboxes']]
     return infoboxes
 
 
@@ -80,11 +80,10 @@ def get(cls, title, attribute):
       attribute (str): The infobox attribute.
     """
     article_infoboxes = get_infoboxes(title)
-    for article_infobox in article_infoboxes:
-        if article_infobox and article_infobox.name == cls:
-            items = article_infobox.items
-            if attribute in items:
-                return items[attribute]
+    for infobox in article_infoboxes:
+        if infobox and infobox.name == cls:
+            if attribute in infobox.attributes:
+                return infobox[attribute]
     return None
 
 
@@ -97,9 +96,9 @@ def get_attributes(cls, title):
     """
     article_infoboxes = get_infoboxes(title)
 
-    for article_infobox in article_infoboxes:
-        if article_infobox and article_infobox.name == cls:
-            return article_infobox.get_all_attributes()
+    for infobox in article_infoboxes:
+        if infobox and infobox.name == cls:
+            return infobox.attributes.keys()
     return []
 
 
@@ -118,7 +117,7 @@ def get_class(title):
         article_infoboxes = get_infoboxes(title)
         if article_infoboxes and len(article_infoboxes) > 0:
             i = sorted(article_infoboxes,
-                       key=lambda i: len(i.attributes),
+                       key=lambda infobox: len(infobox.attributes),
                        reverse=True)[0]
             return i.name
     return None
