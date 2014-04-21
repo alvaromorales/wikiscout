@@ -1,6 +1,7 @@
 from collections import namedtuple
 from pymongo import MongoClient
-from wikiscout import infobox, sentence, wikikb, wikipediabase
+from wikiscout import sentence
+from wikiscout.infobox_parser import Infobox
 from unidecode import unidecode
 
 client = MongoClient('localhost', 27017)
@@ -12,7 +13,7 @@ Candidate = namedtuple('Candidate', ['cls', 'attribute', 'sentence', 'title', 'v
 def main():
     f = open('sentences.tsv', 'w')
     i = 0
-    for simple_article in db.simplewikipedia.find({}, fields={'_id': 0, 'title': 1, 'paragraphs': 1, 'infoboxes': 1}, timeout=False):
+    for simple_article in db.simplewikipedia.find({}, fields={'_id': 0, 'title': 1, 'paragraphs': 1, 'infoboxes': 1, 'sentences': 1}, timeout=False):
         try:
             if i % 100 == 0:
                 print 'Progress: %s' % i
@@ -48,12 +49,15 @@ def process_article(simple_article):
     if len(en_article['infoboxes']) == 0:
         return None
 
-    article_sentences = get_sentences(simple_article['paragraphs'])
+    article_sentences = simple_article['sentences']
+
+    if len(article_sentences) == 0:
+        return None
 
     sentences = set()
     for raw_infobox in en_article['infoboxes']:
-        ibox = infobox.Infobox(raw_infobox)
-        candidates = process_infobox(ibox, title, article_sentences)
+        infobox = Infobox(raw_infobox)
+        candidates = process_infobox(infobox, title, article_sentences)
         for s in candidates:
             sentences.add(s)
 
@@ -62,36 +66,27 @@ def process_article(simple_article):
 
 def process_infobox(infobox, title, article_sentences):
     candidates = []
-    cls = infobox.wiki_class
-    for attribute, value in infobox.items.items():
+    cls = infobox.name
+    for attribute in infobox:
         if ignore_attribute(attribute):
             continue
 
-        values = set([value])
-        classes = wikipediabase.get_classes(unidecode(unicode(value)).encode('ascii', 'ignore'), host='tonga')
-        if classes and 'wikipedia-person' in classes:
-            synonyms = wikikb.get_synonyms(unidecode(unicode(value)).encode('ascii', 'ignore'))
-            if synonyms is not None:
-                for v in synonyms:
-                    values.add(v)
-
         for s in article_sentences:
-            if sentence.contains(s, values):
-                c = Candidate(cls, attribute, s, title, value)
-                candidates.append(c)
+            for value in infobox[attribute]:
+                if sentence.contains(s, [value]):
+                    c = Candidate(cls, attribute, s, title, value)
+                    candidates.append(c)
     return candidates
 
 
 def ignore_attribute(a):
-    if a.lower().find('name') != -1:
+    a = a.lower()
+    if a.find('name') != -1:
         return True
-    if a.lower().find('demonym') != -1:
+    if a.find('demonym') != -1:
         return True
     return False
 
-
-def get_sentences(paragraphs):
-    return sentence.get(paragraphs)
 
 if __name__ == "__main__":
         main()
