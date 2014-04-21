@@ -24,6 +24,7 @@ def _connect(host='localhost'):
 
 
 def get_classes(symbol, host='localhost'):
+    symbol = unidecode(unicode(symbol)).encode('ascii', 'ignore')
     conn = _connect(host)
     conn.write('(get-classes "%s")\n' % symbol)
     response = conn.read_all()
