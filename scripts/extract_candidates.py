@@ -37,6 +37,13 @@ def write_candidates(candidates, f):
 
 
 def process_article(simple_article):
+    if 'sentences' not in simple_article:
+        return None
+
+    article_sentences = simple_article['sentences']
+    if len(article_sentences) == 0:
+        return None
+
     title = simple_article['title']
     en_article = db.wikipedia.find_one({'title': title}, fields={'_id': 0, 'title': 1, 'paragraphs': 1, 'infoboxes': 1})
 
@@ -47,11 +54,6 @@ def process_article(simple_article):
         return None
 
     if len(en_article['infoboxes']) == 0:
-        return None
-
-    article_sentences = simple_article['sentences']
-
-    if len(article_sentences) == 0:
         return None
 
     sentences = set()
