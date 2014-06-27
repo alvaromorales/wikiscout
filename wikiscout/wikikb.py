@@ -3,7 +3,6 @@ from pymongo import MongoClient
 import logging
 from infobox_parser import Infobox
 import omnibase
-import wikipediabase
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,8 @@ def get_article(title, fields=None, lang='en'):
     client, db = _connect()
 
     if fields:
-        fields['_id'] = 0
+        if '_id' not in fields:
+            fields['_id'] = 0
         fields['redirect'] = 1
 
     if lang == 'en':
@@ -54,6 +54,30 @@ def get_article(title, fields=None, lang='en'):
     return article
 
 
+def get_gender(title):
+    """Gets the guessed gender of an article.
+
+    Args:
+      title (str): The title of the article.
+    """
+    article = get_article(title, fields={'gender': 1})
+    if article and 'gender' in article:
+        return article['gender']
+    return None
+
+
+def is_person(title):
+    """Returns true if the article is about a person.
+
+    Args:
+      title (str): The title of the article.
+    """
+    gender = get_gender(title)
+    if gender is not None and gender != 'neuter':
+        return True
+    return False
+
+
 def get_infoboxes(title, lang='en'):
     """Gets infoboxes in an article.
 
@@ -69,6 +93,15 @@ def get_infoboxes(title, lang='en'):
 
     infoboxes = [Infobox(i) for i in article['infoboxes']]
     return infoboxes
+
+
+def get_sentences(title):
+    """Gets sentences in a Simple English Wikipedia that refer to the object"""
+    article = get_article(title, fields={'sentences': 1}, lang='simple')
+    if article is not None and 'sentences' in article:
+        return article['sentences']
+    else:
+        return []
 
 
 def get(cls, title, attribute):
@@ -145,13 +178,11 @@ def get_synonyms(title):
     synonyms = db.synonyms.find_one({'title': title})
 
     if synonyms is not None:
-        # TODO remove external calls
         synonyms = synonyms['synonyms']
-        classes = wikipediabase.get_classes(title, host='tonga')
-        if classes and 'wikipedia-person' in classes:
+        if is_person(title):
             synonyms.extend(omnibase.get('nobel-person', title, 'SYNONYMS', host='tonga'))
         return synonyms
-    return None
+    return []
 
 
 def pick_best_link(matching_links, article_links):
