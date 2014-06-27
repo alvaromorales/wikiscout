@@ -120,3 +120,5 @@ class TestSubWikipediaBaseSymbols(unittest.TestCase):
         annotation = Annotation(sentence,wiki_title,template,value)        
         self.assertEquals(annotation.sub_wb_subject(),"any-wikipedia-officeholder was the president of the US.")
 
+#class TestAnnotation(unitest.TestCase):
+#    pass
