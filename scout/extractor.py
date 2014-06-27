@@ -21,8 +21,8 @@ class MRExtractor(MRJob):
         f = open(self.options.attributes)
         top_attributes = {}
         for l in f:
-            template_attrs = json.loads(l.strip())
-            top_attributes[template_attrs['template']] = template_attrs['attributes']
+            template_attrs = json.loads(l.strip())            
+            top_attributes[template_attrs['template']] = set([a['attribute'] for a in template_attrs['attributes']])
             
         self.top_attributes = top_attributes
 
@@ -33,7 +33,7 @@ class MRExtractor(MRJob):
 
         if 'infobox' not in en_article:
             return
-
+        
         article_infobox = infobox.parse(en_article['infobox']['name'], en_article['infobox']['description'])
 
         if article_infobox is None:
@@ -43,7 +43,9 @@ class MRExtractor(MRJob):
 
         if infobox_type not in self.top_attributes:
             return
-        
+
+        links = en_article['links'] + simple_article['links']
+        highlights = list(set(en_article['highlights']).union(set(simple_article['highlights'])))
         matching_attributes = {}
         
         for attribute, value in infobox.get_items(article_infobox):
@@ -60,7 +62,7 @@ class MRExtractor(MRJob):
 
             for s in simple_sentences:
                 if sentence_tools.has_value(s,value):
-                    attribute_matches.append({'sentence':s,'value':value,'title':title})
+                    attribute_matches.append({'sentence':s,'value':value,'wikiTitle':title})
 
             if attribute not in candidate_sentences:
                 candidate_sentences[attribute] = []
