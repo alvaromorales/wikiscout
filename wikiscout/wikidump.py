@@ -30,7 +30,7 @@ class WikiDump:
     
     def get_title_template(self,wiki_title,lang='en'):
         article = self.get_wiki_title(wiki_title,lang=lang)
-
+        
         if article is None:
             article = self.get_wiki_title(wiki_title,lang=lang,ignorecase=True)
         
@@ -38,6 +38,6 @@ class WikiDump:
             title = article['title'].decode('utf-8').encode('ascii','ignore')
             template = None
             if 'infobox' in article:
-                template = infobox.normalize_template(article['infobox']['name']).decode('utf-8').encode('ascii','ignore')
-            return (title,template)
+                wiki_class = infobox.get_class(article['infobox']['name']).decode('utf-8').encode('ascii','ignore')
+            return (title,wiki_class)
         
