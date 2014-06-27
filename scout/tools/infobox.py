@@ -14,6 +14,11 @@ def normalize_template(template):
     t = re.sub('_+','_',t)
     return t
 
+def normalize_class(template):
+    t = normalize_template(template)
+    t = t.replace('_','-')
+    return t
+
 def validate_template(template):
     return re.match('^[a-z_]+$',template) is not None
     
@@ -40,7 +45,7 @@ def validate_value(value):
 def parse(infobox_template,description):
     infobox_contents = ''.join(['|','|'.join(description)])
     infobox_text = ''.join(['{{',infobox_template.lower(),'\n',infobox_contents,'\n}}'])
-
+    
     infobox = mwparserfromhell.parse(infobox_text)
     
     templates = infobox.filter_templates()

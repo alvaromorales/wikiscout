@@ -1,4 +1,3 @@
-import re
 from pymongo import MongoClient
 import infobox
 
@@ -18,16 +17,17 @@ class WikiDump:
             return self.simplewikipedia.find_one({'title':title})
 
     def get_wiki_title(self,wiki_title,lang='en',ignorecase=False):
+        attribute = 'wikiTitle'
         if ignorecase:
-            wiki_title = re.compile(wiki_title,re.IGNORECASE)
-
+            attribute = 'wikiTitle_lower'
+        
         if lang == 'en':
-            return self.wikipedia.find_one({'wikiTitle':wiki_title})
+            return self.wikipedia.find_one({attribute:wiki_title})
         elif lang == 'simple':
-            return self.simplewikipedia.find_one({'wikiTitle':wiki_title})
+            return self.simplewikipedia.find_one({attribute:wiki_title})
         elif lang == 'join':
-            return self.joined_wikipedia.find_one({'wikiTitle':wiki_title})
-
+            return self.joined_wikipedia.find_one({attribute:wiki_title})
+    
     def get_title_template(self,wiki_title,lang='en'):
         article = self.get_wiki_title(wiki_title,lang=lang)
 
@@ -35,9 +35,9 @@ class WikiDump:
             article = self.get_wiki_title(wiki_title,lang=lang,ignorecase=True)
         
         if article is not None:
-            title = article['title'].decode('utf8').encode('ascii','ignore')
+            title = article['title'].decode('utf-8').encode('ascii','ignore')
             template = None
             if 'infobox' in article:
-                template = infobox.normalize_template(article['infobox']['name']).decode('utf8').encode('ascii','ignore')
+                template = infobox.normalize_template(article['infobox']['name']).decode('utf-8').encode('ascii','ignore')
             return (title,template)
         

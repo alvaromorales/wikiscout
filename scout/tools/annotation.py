@@ -1,10 +1,12 @@
 import re
 import logging
+from string import punctuation
 from wikipediabase import WikipediaBase
 from wikidump import WikiDump
 from omnibase import Omnibase
 from corenlp import CoreNLP
 from nltk.corpus import stopwords
+from nltk.tokenize import regexp_tokenize
 
 ### Convert text into annotations
 
@@ -55,8 +57,11 @@ class Annotation:
             self.links = en_article['links']
 
         self.wb_classes = self.wb.get_classes(self.title)
-        self.symbol = self.generate_symbol(self.get_class(self.wb_classes))
+        if len(self.wb_classes) == 0:
+            raise Exception('Article "%s" is not in WikipediaBase.'%self.title)
+
         self.ob_symbols = self.filter_symbols(self.ob.get_known(self.sentence,omnibase_class='wikipedia-term'))
+        self.symbol = self.generate_symbol(self.get_class(self.wb_classes))
         
     @staticmethod
     def generate_symbol(s):
@@ -76,7 +81,8 @@ class Annotation:
             return symbol
     
     def filter_symbols(self,symbols):
-        return filter(lambda s: s['match'].lower() not in self.stopwords,symbols)
+        if symbols is not None:
+            return filter(lambda s: s['match'].lower() not in self.stopwords,symbols)
 
     def sub_title(self):
         # possesive
@@ -226,11 +232,11 @@ class Annotation:
                     logging.info('Found WB subject from wikipedia-person synonyms: %s.'%syn)
                     logging.debug('sub_wb_subject: %s'%annotation)
                     return annotation
-
-        # try to find an omnibase symbol with the same class as the title
-        c = self.get_class(self.wb_classes)
-        logging.info('TODO: reached end of sub_wb_subject')
-        print "FIND SUBJECT FROM CLASSES: %s"%c
+        
+        ## try to find an omnibase symbol with the same class as the title
+        #c = self.get_class(self.wb_classes)
+        #logging.info('TODO: reached end of sub_wb_subject')
+        #print "FIND SUBJECT FROM CLASSES: %s"%c
 
     # assumes annotation contains substring value
     def replace_value(self,annotation,value,wiki_title,prefer_wikibase=True):
@@ -278,7 +284,6 @@ class Annotation:
                 continue
 
             if annotation.find(value) != -1:
-
                 # only care about proper nouns
                 if not value[0].isupper():
                     logging.info('Skipping link "%s" because it is not a proper noun.'%value)
@@ -289,12 +294,11 @@ class Annotation:
                     span = match.span()
                     value = self.find_subsumed(span,value)
                     
-                logging.debug('Found link: %s'%value)
-
-                result = self.replace_value(annotation,value,wiki_title)
-                if result is not None:
-                    annotation = result
-                    logging.debug('%s'%annotation)
+                    logging.debug('Found link: %s'%value)
+                    result = self.replace_value(annotation,value,wiki_title)
+                    if result is not None:
+                        annotation = result
+                        logging.debug('%s'%annotation)
 
         logging.debug('sub_links: %s'%annotation)
         self.annotation = annotation
@@ -312,7 +316,7 @@ class Annotation:
     def sub_value(self):
         logging.debug('In sub_value')
         # attempt to lookup and replace value
-        #value_symbols = self.ob.get_known(self.value,omnibase_class='wikipedia-term')
+
         value_symbols = filter(lambda symbol: symbol['match'].find(self.value) != -1, self.ob_symbols)
         value_matches = sorted([symbol for symbol in value_symbols if self.value == symbol['symbol']],key= lambda symbol: symbol['span'][1] - symbol['span'][0],reverse=True)
 
@@ -343,12 +347,48 @@ class Annotation:
         self.annotation = annotation
         logging.debug('sub_ner: %s'%self.annotation)
 
+    @staticmethod
+    def index_symbols(annotation):
+        numbers = { 1 : 'one', 2 : 'two', 3 : 'three', 4 : 'four', 5 : 'five', 6 : 'six', 7 : 'seven', 8 : 'eight', 9 : 'nine',
+                    10 : 'ten', 11 : 'eleven', 12 : 'twelve', 13 : 'thirteen', 14 : 'fourteen', 15 : 'fifteen', 16 : 'sixteen',
+                    17 : 'seventeen', 18 : 'eighteen', 19 : 'nineteen' , 20 : 'twenty' }
+        
+        tokens = annotation.split(' ')
+        normalized = []
+
+        for t in tokens:
+            if t.endswith("'s"):
+                t = t[:-2]
+                normalized.append(t)
+                normalized.append("'s")
+            elif t[-1] in punctuation:
+                end = t[-1]
+                normalized.append(t[:-1])
+                normalized.append(end)
+            else:
+                normalized.append(t)
+        
+        tokens = normalized[:]
+        
+        for t in tokens:
+            if t.startswith('any-'):
+                if tokens.count(t) > 1:
+                    index = 1
+                    for i,symbol in enumerate(tokens):
+                        if symbol == t:
+                            tokens[i] = symbol + '-%s'%numbers[index]
+                            index += 1
+
+        punc = set(punctuation + '`\'"')
+        return ''.join(w if set(w) <= punc or w == "'s" else ' '+w for w in tokens).lstrip()
+    
     def normalize(self):
         annotation = self.annotation
 
         annotation = re.sub(r'\(.*?\)','',annotation)
         annotation = re.sub(r'\s+',' ',annotation)
-
+        annotation = self.index_symbols(annotation)
+        
         self.annotation = annotation
         logging.debug('normalize: %s'%self.annotation)
 
@@ -357,11 +397,11 @@ class Annotation:
         try:
             annotation = self.sub_subject()
         except Exception as e:
-            print e
-            return None
+            raise Exception(e)
         
         if annotation is None:
             raise Exception("Could not find a subject in: \"%s\"."%self.sentence)
+
         self.annotation = annotation
         
         self.sub_value()

@@ -120,5 +120,17 @@ class TestSubWikipediaBaseSymbols(unittest.TestCase):
         annotation = Annotation(sentence,wiki_title,template,value)        
         self.assertEquals(annotation.sub_wb_subject(),"any-wikipedia-president was the president of the US.")
 
-#class TestAnnotation(unitest.TestCase):
-#    pass
+class TestIndexSymbols(unittest.TestCase):
+    def test_no_indexes(self):
+        annotation = "any-wikipedia-anthem is the national anthem of any-wikipedia-country."
+        self.assertEquals(Annotation.index_symbols(annotation),annotation)
+
+    def test_index(self):
+        annotation = "any-wikipedia-person studied at the any-wikipedia-university from any-date to any-date."
+        expected = "any-wikipedia-person studied at the any-wikipedia-university from any-date-one to any-date-two."
+        self.assertEquals(Annotation.index_symbols(annotation),expected)
+
+    def test_possesive_index(self):
+        annotation = "any-wikipedia-term's any-wikipedia-term studied at the any-wikipedia-university."
+        expected = "any-wikipedia-term-one's any-wikipedia-term-two studied at the any-wikipedia-university."
+        self.assertEquals(Annotation.index_symbols(annotation),expected)
