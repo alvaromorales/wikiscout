@@ -21,19 +21,31 @@ def _connect_wikigraph():
     return neo4j.GraphDatabaseService()
 
 
-def get_article(title, lang='en'):
+def get_article(title, fields=None, lang='en'):
     """Gets an article.
 
     Args:
       title (str): The title of the article.
-      lang (str): The language of the article. Defaults to 'en'
+      fields (dict): A dictionary of which fields to include.
+      lang (str): The language of the article. Defaults to 'en'.
     """
     client, db = _connect()
 
+    if fields:
+        fields['_id'] = 0
+        fields['redirect'] = 1
+
     if lang == 'en':
-        article = db.wikipedia.find_one({'title': title})
+        if fields:
+            article = db.wikipedia.find_one({'title': title}, fields=fields)
+        else:
+            article = db.wikipedia.find_one({'title': title})
     elif lang == 'simple':
-        article = db.simplewikipedia.find_one({'title': title})
+        if fields:
+            article = db.simplewikipedia.find_one({'title': title},
+                                                  fields=fields)
+        else:
+            article = db.simplewikipedia.find_one({'title': title})
     else:
         return None
 
@@ -43,20 +55,21 @@ def get_article(title, lang='en'):
     return article
 
 
-def get_infobox(title, lang='en'):
-    """Gets an article's infobox.
+def get_infoboxes(title, lang='en'):
+    """Gets infoboxes in an article.
 
     Args:
       title (str): The title of the article.
       lang (str): The language of the article. Defaults to 'en'.
     """
-    article = get_article(title, lang)
+    fields = {'infoboxes': 1}
+    article = get_article(title, fields=fields, lang=lang)
 
-    if article is None or 'infobox' not in article:
+    if article is None or 'infoboxes' not in article:
         return None
 
-    article_infobox = infobox.Infobox(article['infobox'])
-    return article_infobox
+    infoboxes = [infobox.Infobox(i) for i in article['infoboxes']]
+    return infoboxes
 
 
 def get(cls, title, attribute):
@@ -67,11 +80,12 @@ def get(cls, title, attribute):
       title (str): The title of the article.
       attribute (str): The infobox attribute.
     """
-    article_infobox = get_infobox(title)
-    if article_infobox and article_infobox.name == cls:
-        items = article_infobox.items
-        if attribute in items:
-            return items[attribute]
+    article_infoboxes = get_infoboxes(title)
+    for article_infobox in article_infoboxes:
+        if article_infobox and article_infobox.name == cls:
+            items = article_infobox.items
+            if attribute in items:
+                return items[attribute]
     return None
 
 
@@ -82,14 +96,18 @@ def get_attributes(cls, title):
       cls (str): The WikipediaBase class.
       title (str): The title of the article.
     """
-    article_infobox = get_infobox(title)
-    if article_infobox and article_infobox.name == cls:
-        return article_infobox.get_all_attributes()
+    article_infoboxes = get_infoboxes(title)
+    for article_infobox in article_infoboxes:
+        if article_infobox and article_infobox.name == cls:
+            return article_infobox.get_all_attributes()
     return []
 
 
 def get_class(title):
     """Gets the WikipediaBase class of an article.
+       If an article contains multiple infoboxes,
+       its wikipedia class is the class of the infobox
+       with the most number of attributes.
 
     Args:
       title (str): The article title.
@@ -97,9 +115,24 @@ def get_class(title):
     article = get_article(title)
 
     if article:
-        article_infobox = get_infobox(title)
-        if article_infobox:
-            return article_infobox.name
+        article_infoboxes = get_infoboxes(title)
+        if article_infoboxes and len(article_infoboxes) > 0:
+            i = sorted(article_infoboxes,
+                       key=lambda i: len(i.attributes),
+                       reverse=True)[0]
+            return i.name
+    return None
+
+
+def get_all_classes(title):
+    """Gets all the classes of an article.
+
+    Args:
+      title (str): The article title.
+    """
+    article = get_article(title, fields={'classes': 1})
+    if article:
+        return article['classes']
     return None
 
 
