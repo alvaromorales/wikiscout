@@ -20,13 +20,13 @@ def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
               }
 
     r = requests.get('http://start.csail.mit.edu/askstart.cgi',
-                        params=params)
+                     params=params)
 
     try:
         response = xmltodict.parse(r.text)
     except:
         raise STARTParseResponseException('Could not parse: %s' % r.text)
-    
+
     return response
 
 
