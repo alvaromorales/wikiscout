@@ -79,8 +79,8 @@ class Tokenization:
         return "Tokenization(%s)" % ([t.value for t in self.tokens])
 
 
-def tokenize(sentence):
-    response = start.tokenize(sentence)
+def tokenize(sentence, machine='malta'):
+    response = start.tokenize(sentence, machine=machine)
     tokenizations = response['tokenizations']['tokenization']
     if type(tokenizations) is list:
         return [Tokenization(t) for t in tokenizations]
