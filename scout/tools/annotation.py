@@ -1,18 +1,52 @@
 import re
 from wikipediabase import WikipediaBase
+from wikidump import WikiDump
 from omnibase import Omnibase
 
 ### Convert text into annotations
 
 class Annotation:
-    def __init__(self,sentence,title,template,highlights=[]):
+    def __init__(self,sentence,wiki_title,template,value,highlights=[]):
         self.sentence = sentence
-        self.title = title
+        self.wiki_title = wiki_title
         self.symbol = self.generate_symbol(template)
-        self.highlights = sorted(highlights,key=len,reverse=True)
-        self.annotation = None
-        self.get_wb_metadata()
+        self.template = template
+        self.value = value
+        
+        self.wb = WikipediaBase(host='nauru.csail.mit.edu')
+        self.ob = Omnibase(host='nauru.csail.mit.edu')
+        self.wdump = WikiDump(host='nauru.csail.mit.edu')
+        
+        self.get_article_data()
 
+        self.highlights.extend(highlights)
+        self.highlights = sorted(self.highlights,key=len,reverse=True)        
+        self.annotation = None
+
+    def get_article_data(self):
+        join_article = self.wdump.get_wiki_title(self.wiki_title,lang='join')
+        
+        if join_article is not None:
+            self.highlights = join_article['en']['highlights']
+            self.highlights.extend(join_article['simple']['highlights'])
+            
+            self.title = join_article['en']['title'].decode('utf8').encode('ascii')
+            self.links = join_article['en']['links']
+            self.links.extend(join_article['simple']['links'])
+            
+        else:
+            en_article = self.wdump.get_wiki_title(self.wiki_title)
+            
+            if en_article is None:
+                raise ValueError('Could not find an article with wiki_title : %s'%self.wiki_title)
+            
+            self.highlights = en_article['highlights']
+            self.title = en_article['title'].decode('utf8').encode('ascii')
+            self.links = en_article['links']
+
+        self.wb_classes = self.wb.get_classes(self.title)
+        self.ob_symbols = self.ob.get_known(self.sentence,omnibase_class='wikipedia-term')
+            
     @staticmethod
     def generate_symbol(s):
         if s.find(' ') != -1:
@@ -52,13 +86,6 @@ class Annotation:
             if re.match(r'\b%s(?:\'s)?\b'%h,self.sentence):
                 return re.sub(r'\b%s'%h,self.symbol,self.sentence,count=1)
 
-    def get_wb_metadata(self):
-        self.wb = WikipediaBase(host='nauru.csail.mit.edu')
-        self.ob = Omnibase(host='nauru.csail.mit.edu')
-
-        self.wb_classes = self.wb.get_classes(self.title)
-        self.ob_symbols = self.ob.get_known(self.sentence,omnibase_class='wikipedia-term')
-        
     @staticmethod
     def get_class(classes):
         ignore = set(['wikipedia-term','wikipedia-paragraphs','wikipedia-paragraph','wikipedia-person'])
@@ -111,8 +138,18 @@ class Annotation:
             
         else:
             # try to find an omnibase symbol with the same class as the title
-            
-            pass
+            c = self.get_class(self.wb_classes)
+
+            print "Reached else clause in WB subject"
+            raise
+
+            if c is None:
+                return
+
+            for o in self.ob_symbols:
+                break
+    
+    def annotate_sentence(self):
+        annotation = self.annotation
+        subject = self.annotation
         
-        print self.wb_classes
-        print self.ob_symbols
