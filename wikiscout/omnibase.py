@@ -31,10 +31,16 @@ def get(cls, symbol, attribute, host='localhost'):
     conn.close()
     response = re.sub(r'\n', '', response)
 
-    if response == '#f':
+    if response == '#f' or response == '("")':
         return None
 
-    return list(eval(response.replace('" "', '","')))
+    response = OneOrMore(nestedExpr()).parseString(response)[0]
+
+    if response[0] == 'error':
+        return None
+
+    response = [x[1:-1] for x in response]
+    return response
 
 
 def get_symbols(s, cls=None, host='localhost'):
@@ -44,7 +50,6 @@ def get_symbols(s, cls=None, host='localhost'):
     if cls:
         conn.write('(get-symbols %s \':class "%s")\n' % (s, cls))
     else:
-        print "writing : (get-symbols %s)\n" % s
         conn.write('(get-symbols %s)\n' % s)
 
     response = conn.read_until('\n').strip()
@@ -87,8 +92,7 @@ def _parse_get_symbols_response(response):
         raise OmnibaseParseException("Could not parse %s" % response)
 
     if data[0][0] == "error":
-        print response
-        raise Exception()
+        raise OmnibaseException(response)
 
     for d in data[0]:
         r = {}

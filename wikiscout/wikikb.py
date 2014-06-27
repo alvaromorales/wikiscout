@@ -1,6 +1,12 @@
 from py2neo import neo4j
 from pymongo import MongoClient
+import logging
 import infobox
+
+logger = logging.getLogger(__name__)
+
+py2neo_log = logging.getLogger('py2neo')
+py2neo_log.setLevel(logging.WARNING)
 
 
 def _connect(host='localhost'):
@@ -129,7 +135,10 @@ def pick_best_link(links, object):
     spaths = []
     for l in links:
         spaths.append((l['title'], shortest_path_length(object, l['title'])))
-    return min(spaths, key=lambda x: x[1])[0]
+
+    link = min(spaths, key=lambda x: x[1])[0]
+    logger.debug("Picked %s out of %s" % (link, spaths))
+    return link
 
 
 def get_synonym_title(synonym, object):
@@ -140,9 +149,10 @@ def get_synonym_title(synonym, object):
     """
     client, db = _connect()
     titles = db.inverted_synonyms.find({'synonym': synonym})
-    if titles is not None:
+    if titles.count() != 0:
         if titles.count() == 1:
             return titles[0]['title']
 
         return pick_best_link(titles, object)
+
     return None
