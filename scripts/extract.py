@@ -1,6 +1,6 @@
 from collections import namedtuple
 from pymongo import MongoClient
-from wikiscout import infobox, sentence, wikikb
+from wikiscout import infobox, sentence, wikikb, wikipediabase
 
 client = MongoClient('localhost', 27017)
 db = client.wiki
@@ -11,15 +11,15 @@ Candidate = namedtuple('Candidate', ['cls', 'attribute', 'sentence', 'title', 'v
 def main():
     f = open('sentences.tsv', 'w')
     i = 0
-    for simple_article in db.simplewikipedia.find({}, fields={'_id': 0, 'title': 1, 'paragraphs': 1, 'infoboxes': 1}):
+    for simple_article in db.simplewikipedia.find({}, fields={'_id': 0, 'title': 1, 'paragraphs': 1, 'infoboxes': 1}, timeout=False):
         try:
-            if i % 1000 == 0:
+            if i % 100 == 0:
                 print 'Progress: %s' % i
             candidates = process_article(simple_article)
             if candidates:
                 write_candidates(candidates, f)
             i += 1
-        except Exception as e:
+        except Exception:
             continue
 
     f.close()
@@ -28,6 +28,7 @@ def main():
 def write_candidates(candidates, f):
     for c in candidates:
         f.write('%s\n' % "\t".join([c.cls, c.attribute, c.sentence, c.title, c.value]))
+        f.flush()
 
 
 def process_article(simple_article):
@@ -60,8 +61,12 @@ def process_infobox(infobox, title, article_sentences):
             continue
 
         values = set([value])
-        for v in wikikb.get_synonyms(value):
-            values.add(v)
+        classes = wikipediabase.get_classes(value.encode('ascii', 'ignore'), host='tonga')
+        if classes and 'wikipedia-person' in classes:
+            synonyms = wikikb.get_synonyms(value)
+            if synonyms is not None:
+                for v in wikikb.get_synonyms(value):
+                    values.add(v)
 
         for s in article_sentences:
             if sentence.contains(s, values):

@@ -1,8 +1,6 @@
 import re
 import logging
 import wikikb
-import omnibase
-import wikipediabase
 import tokenize
 from nltk.corpus import stopwords
 
@@ -20,14 +18,14 @@ class ObjectSymbolNotFoundException(Exception):
 # Annotation Generation methods
 
 def replace_title(title, symbol, tokenization):
-    title_possesive = title + '\'s'
+    title_possessive = title + '\'s'
     ok = False
 
     for i, token in enumerate(tokenization.tokens):
         if token.value == title:
             tokenization.tokens[i] = tokenization.replace_token(token, symbol)
             ok = True
-        elif token.value == title_possesive:
+        elif token.value == title_possessive:
             tokenization.tokens[i] = tokenization.replace_token(token,
                                                                 symbol + '\'s')
             ok = True
@@ -50,22 +48,8 @@ def replace_pronoun(object, symbol, tokenization):
     return False
 
 
-# TODO temp solution
-# make more efficient by removing external calls
-def get_person_synonyms(object):
-    classes = wikipediabase.get_classes(object, host='tonga')
-    if classes and 'wikipedia-person' in classes:
-        return omnibase.get('nobel-person', object, 'SYNONYMS', host='tonga')
-    return []
-
-
 def replace_synonyms(object, symbol, tokenization):
-    synonyms = []
-    wiki_synonyms = wikikb.get_synonyms(object)
-    if wiki_synonyms:
-        synonyms.extend(wiki_synonyms)
-
-    synonyms.extend(get_person_synonyms(object))
+    synonyms = wikikb.get_synonyms(object)
 
     if len(synonyms) == 0:
         return False
@@ -102,9 +86,9 @@ def replace_proper_nouns(object, tokenization):
                 stopwords.words('english'):
             continue
 
-        possesive = re.search(r'(.*?)\'s$', t.value)
-        if possesive:
-            noun = possesive.group(1)
+        possessive = re.search(r'(.*?)\'s$', t.value)
+        if possessive:
+            noun = possessive.group(1)
             cls = wikikb.get_class(noun)
             if cls:
                 tokenization.tokens[i] = tokenization.replace_token(
@@ -152,7 +136,7 @@ def annotate(sentence, object):
 
     symbol = 'any-%s' % cls
     tokenization = tokenize.tokenize(sentence)[0]
-    logger.info('Tokenized as %s' % tokenization.tokens)
+    logger.info('Tokenized as %s' % [t.value for t in tokenization.tokens])
 
     if replace_object(object, symbol, tokenization):
         replace_proper_nouns(object, tokenization)
