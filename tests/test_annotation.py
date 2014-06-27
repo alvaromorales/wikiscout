@@ -100,3 +100,24 @@ class TestProperNouns(unittest.TestCase):
         annotation.replace_proper_nouns(tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
+
+
+class TestAnnotate(unittest.TestCase):
+    def test_annotate(self):
+        sentence = 'Bill Clinton married Hillary Rodham'
+        object = 'Bill Clinton'
+        expected = 'any-wikipedia-president married any-wikipedia-officeholder'
+        a = annotation.annotate(sentence, object)
+        self.assertEquals(a.join_tokens(), expected)
+
+    def test_no_object(self):
+        sentence = 'Hillary Clinton attended Wellesley College'
+        object = 'Bill Clinton'
+        self.assertRaises(annotation.ObjectNotFoundException,
+                          annotation.annotate, sentence, object)
+
+    def test_no_symbol(self):
+        sentence = 'Bill Clinton married Hillary Rodham'
+        object = 'WrongOBJECT'
+        self.assertRaises(annotation.ObjectSymbolNotFoundException,
+                          annotation.annotate, sentence, object)
