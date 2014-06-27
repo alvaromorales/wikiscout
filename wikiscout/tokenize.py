@@ -11,6 +11,7 @@ numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
            15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen',
            19: 'nineteen', 20: 'twenty'}
 
+
 class Token:
     def __init__(self, value):
         self.value = value
@@ -30,8 +31,10 @@ class Token:
 
 
 class Tokenization:
-    def __init__(self, start_tokenization):
-        self.tokens = [Token(t) for t in start_tokenization['tokens']['token']]
+    def __init__(self, start_tokenization, sentence):
+        tokens = replace_commas(sentence, start_tokenization['tokens']['token'])
+        self.tokens = [Token(t) for t in tokens]
+        self.sentence = sentence
         self.unknown_words = []
         if start_tokenization['unknown-words'] is not None:
             self.unknown_words = [Token(t) for t in
@@ -47,11 +50,11 @@ class Tokenization:
         """Join tokens and index multiple occurrences of a matching symbol"""
         normalized = [t.noun() for t in self.tokens]
         tokens = []
-        
+
         index_counts = {}
         indexed_tokens = {}
 
-        for i,t in enumerate(normalized):
+        for i, t in enumerate(normalized):
             token = self.tokens[i]
             if t.startswith('any-'):
                 if normalized.count(t) > 1:
@@ -81,8 +84,68 @@ class Tokenization:
 
 def tokenize(sentence, machine='malta'):
     response = start.tokenize(sentence, machine=machine)
+
+    if 'tokenizations' not in response:
+        return []
+
     tokenizations = response['tokenizations']['tokenization']
     if type(tokenizations) is list:
-        return [Tokenization(t) for t in tokenizations]
+        return [Tokenization(t, sentence) for t in tokenizations]
     else:
-        return [Tokenization(tokenizations)]
+        return [Tokenization(tokenizations, sentence)]
+
+
+def find(s, ch):
+    return [i for i, ltr in enumerate(s) if ltr == ch]
+
+
+def get_surrounding(s, i):
+    words = [s[i]]
+
+    before = i-1
+    while before > 0 and s[before].isalpha():
+        c = s[before]
+        words.insert(0, c)
+        before -= 1
+
+    after = i + 1
+    if after < len(s):
+        words.append(s[after])
+        after += 1
+
+    while after < len(s) and s[after].isalpha():
+        c = s[after]
+        words.append(c)
+        after += 1
+
+    return "".join(words)
+
+
+def insert_comma(value, surround):
+    without = surround.replace(',', '')
+    pos = value.find(without)
+
+    split = [value[:pos], value[pos:pos+len(without)], value[pos+len(without):]]
+    split[1] = surround
+    return "".join(split)
+
+
+def replace_commas(sentence, tokens):
+    # only add commas in between tokens (such as locations)
+    last_token = -1
+    for i in find(sentence, ','):
+        surrounding = get_surrounding(sentence, i)
+        without = surrounding.replace(',', '')
+        if len(surrounding) <= 2:
+            continue
+
+        for j, t in enumerate(tokens):
+            if j < last_token:
+                continue
+
+            if t.find(without) != -1:
+                tokens[j] = insert_comma(t, surrounding)
+                last_token = j
+                break
+
+    return tokens
