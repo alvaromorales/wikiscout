@@ -3,6 +3,9 @@ import re
 import mwparserfromhell
 from dewiki.parser import Parser as DewikiParser
 
+class InfoboxParseException(Exception):
+    pass
+
 def get_class(template):
     """Returns a wikipedia class given an infobox template."""
     wiki_class = template.lower().strip()
@@ -62,7 +65,7 @@ class Infobox:
             self.infobox = templates[0]
             self.name = wiki_class
         else:
-            raise Exception('Could not generate Infobox')
+            raise InfoboxParseException()
 
     @property
     def attributes(self):
