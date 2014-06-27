@@ -1,3 +1,4 @@
+from py2neo import neo4j
 from pymongo import MongoClient
 import infobox
 
@@ -8,6 +9,10 @@ def _connect(host='localhost'):
     client = MongoClient(host, 27017)
     db = client.wiki
     return (client, db)
+
+
+def _connect_wikigraph():
+    return neo4j.GraphDatabaseService()
 
 
 def get_article(title, lang='en'):
@@ -105,14 +110,39 @@ def get_synonyms(title):
     return None
 
 
-def get_synonym_title(synonym):
+def shortest_path_length(t1, t2):
+    graph_db = _connect_wikigraph()
+
+    query_string = """MATCH (p0:Page {title:'%s'}), (p1:Page {title:'%s'}),
+                        p = shortestPath((p0)-[*..6]-(p1))
+                      RETURN p""" % (t1, t2)
+
+    result = neo4j.CypherQuery(graph_db, query_string).execute()
+    path_lengths = [len(r.p) for r in result]
+    if len(path_lengths) > 0:
+        return min(path_lengths)
+    else:
+        return float('inf')
+
+
+def pick_best_link(links, object):
+    spaths = []
+    for l in links:
+        spaths.append((l['title'], shortest_path_length(object, l['title'])))
+    return min(spaths, key=lambda x: x[1])[0]
+
+
+def get_synonym_title(synonym, object):
     """Gets an article's title given a synonym.
 
     Args:
       synonym (str): A synonym of the article's title.
     """
     client, db = _connect()
-    title = db.inverted_synonyms.find_one({'synonym': synonym})
-    if title is not None:
-        return title['title']
+    titles = db.inverted_synonyms.find({'synonym': synonym})
+    if titles is not None:
+        if titles.count() == 1:
+            return titles[0]['title']
+
+        return pick_best_link(titles, object)
     return None
