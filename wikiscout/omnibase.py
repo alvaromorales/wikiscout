@@ -26,8 +26,8 @@ def _connect(host='localhost'):
 
 def get(cls, symbol, attribute, host='localhost'):
     conn = _connect(host)
-    conn.write('(get "%s" "%s"  "%s")' % (cls, symbol, attribute.upper()))
-    response = conn.read_all().strip()
+    conn.write('(get "%s" "%s"  "%s")\n' % (cls, symbol, attribute.upper()))
+    response = conn.read_until('\n').strip()
     conn.close()
     response = re.sub(r'\n', '', response)
 
@@ -42,11 +42,12 @@ def get_symbols(s, cls=None, host='localhost'):
     s = json.dumps(s)
 
     if cls:
-        conn.write('(get-symbols %s \':class "%s")' % (s, cls))
+        conn.write('(get-symbols %s \':class "%s")\n' % (s, cls))
     else:
-        conn.write('(get-symbols %s)' % s)
+        print "writing : (get-symbols %s)\n" % s
+        conn.write('(get-symbols %s)\n' % s)
 
-    response = conn.read_all()
+    response = conn.read_until('\n').strip()
     conn.close()
 
     parsed_response = _parse_get_symbols_response(response)
@@ -58,11 +59,11 @@ def get_known(s, cls=None, host='localhost'):
     s = json.dumps(s)
 
     if cls:
-        conn.write('(get-known %s \':class "%s")' % (s, cls))
+        conn.write('(get-known %s \':class "%s")\n' % (s, cls))
     else:
-        conn.write('(get-known %s)' % s)
+        conn.write('(get-known %s)\n' % s)
 
-    response = conn.read_all()
+    response = conn.read_until('\n').strip()
     conn.close()
 
     parsed_response = _parse_get_symbols_response(response)
