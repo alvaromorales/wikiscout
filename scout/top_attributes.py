@@ -22,7 +22,7 @@ class MRTopAttributes(MRJob):
             if i is None:
                 return
             
-            attributes = [infobox.normalize_attribute(a) for a in infobox.get_attributes(i) if infobox.validate_attribute(a)]
+            attributes = infobox.get_attributes(i)
             
             for a in attributes:
                 yield infobox_template, (a,1)
