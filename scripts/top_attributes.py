@@ -3,7 +3,8 @@ import re
 from mrjob.protocol import JSONValueProtocol
 from mrjob.job import MRJob
 from collections import Counter
-from tools import infobox
+
+from wikiscout import infobox
 
 class MRTopAttributes(MRJob):
     INPUT_PROTOCOL = JSONValueProtocol

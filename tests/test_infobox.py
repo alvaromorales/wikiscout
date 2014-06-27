@@ -1,5 +1,5 @@
 import unittest
-from scout.tools import infobox
+from wikiscout import infobox
 
 class TestNormalizeTemplate(unittest.TestCase):
     def test_caps(self):

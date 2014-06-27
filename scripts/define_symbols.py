@@ -4,9 +4,9 @@ import argparse
 import logging
 import json
 
-from tools.infobox import normalize_class
-from tools.annotation import Annotation
-from tools import schemata
+from wikiscout.infobox import normalize_class
+from wikiscout.annotation import Annotation
+from wikiscout import schemata
 
 def main(args, loglevel):
     logging.basicConfig(format="%(levelname)s: %(message)s", level=loglevel)

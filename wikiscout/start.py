@@ -13,7 +13,7 @@ class START:
     def connect(self):
         # open a new telnet connection to START
         try:
-            self.telnet = telnetlib.Telnet(self.host,8001)
+            self.telnet = telnetlib.Telnet(self.host,8002)
             self.remote_address = socket.gethostbyname(socket.gethostname())
         except:
             raise Exception("Could not connect to START host %s"%self.host)

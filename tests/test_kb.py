@@ -1,5 +1,5 @@
 import unittest
-from kb import WikiKB, Infobox
+from wikiscout.wikikb import WikiKB, Infobox
 
 class TestInfobox(unittest.TestCase):
     def test_cls(self):

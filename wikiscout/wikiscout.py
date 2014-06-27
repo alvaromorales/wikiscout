@@ -2,8 +2,8 @@ import sys
 import argparse
 import logging
 import json
-from tools.annotation import Annotation
-from tools.start import START
+from annotation import Annotation
+from start import START
 from scout import Scout
 
 def main(args, loglevel):

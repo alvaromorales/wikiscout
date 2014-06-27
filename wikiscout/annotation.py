@@ -1,12 +1,13 @@
 import re
 import logging
 from string import punctuation
+from nltk.corpus import stopwords
+from nltk.tokenize import regexp_tokenize
+
 from wikipediabase import WikipediaBase
 from wikidump import WikiDump
 from omnibase import Omnibase
 from corenlp import CoreNLP
-from nltk.corpus import stopwords
-from nltk.tokenize import regexp_tokenize
 
 ### Convert text into annotations
 
