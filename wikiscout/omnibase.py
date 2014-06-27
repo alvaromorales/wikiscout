@@ -2,6 +2,7 @@ import json
 import re
 from pyparsing import OneOrMore, nestedExpr
 import telnetlib
+from unidecode import unidecode
 
 
 class OmnibaseConnectionException(Exception):
@@ -25,6 +26,7 @@ def _connect(host='localhost'):
 
 
 def get(cls, symbol, attribute, host='localhost'):
+    symbol = unidecode(unicode(symbol)).encode('ascii', 'ignore')
     conn = _connect(host)
     conn.write('(get "%s" "%s"  "%s")\n' % (cls, symbol, attribute.upper()))
     response = conn.read_until('\n').strip()
@@ -44,6 +46,7 @@ def get(cls, symbol, attribute, host='localhost'):
 
 
 def get_symbols(s, cls=None, host='localhost'):
+    s = unidecode(unicode(s)).encode('ascii', 'ignore')
     conn = _connect(host)
     s = json.dumps(s)
 
@@ -60,6 +63,7 @@ def get_symbols(s, cls=None, host='localhost'):
 
 
 def get_known(s, cls=None, host='localhost'):
+    s = unidecode(unicode(s)).encode('ascii', 'ignore')
     conn = _connect(host)
     s = json.dumps(s)
 
