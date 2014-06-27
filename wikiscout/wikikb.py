@@ -46,10 +46,10 @@ def get_article(title, fields=None, lang='en'):
 
     while article is not None and 'redirect' in article:
         if fields:
-            article = db.wikipedia.find_one({'title': article['redirect']},
+            article = db.wikipedia.find_one({'wikiTitle': article['redirect']},
                                             fields=fields)
         else:
-            article = db.wikipedia.find_one({'title': article['redirect']})
+            article = db.wikipedia.find_one({'wikiTitle': article['redirect']})
 
     return article
 

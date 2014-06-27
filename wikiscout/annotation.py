@@ -3,6 +3,7 @@ import logging
 import wikikb
 import tokenize
 from nltk.corpus import stopwords
+from unidecode import unidecode
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,9 @@ def replace_proper_nouns(object, tokenization):
 
 
 def annotate(sentence, object):
+    sentence = unidecode(unicode(sentence))
+    object = unidecode(unicode(object))
+
     cls = wikikb.get_class(object)
     if not cls:
         raise ObjectSymbolNotFoundException(
