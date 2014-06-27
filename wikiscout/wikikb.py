@@ -77,8 +77,8 @@ def get_attributes(cls, title):
     return []
 
 
-def get_classes(title):
-    """Gets the WikipediaBase classes of an article.
+def get_class(title):
+    """Gets the WikipediaBase class of an article.
 
     Args:
       title (str): The article title.
@@ -86,12 +86,10 @@ def get_classes(title):
     article = get_article(title)
 
     if article:
-        wiki_classes = ['wikipedia-term', 'wikipedia-paragraphs']
         article_infobox = get_infobox(title)
         if article_infobox:
-            wiki_classes.append(article_infobox.name)
-        return wiki_classes
-    return []
+            return article_infobox.name
+    return None
 
 
 def get_synonyms(title):
