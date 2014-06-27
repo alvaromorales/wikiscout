@@ -1,11 +1,12 @@
 import mwparserfromhell
+from dewiki.parser import Parser as DewikiParser
 import re
 
 ### Templates
 
 def normalize_template(template):
     t = template.lower().strip()
-    t = t.replace('__','_')
+    t = re.sub('_+','_',t)
     return t
 
 def validate_template(template):
@@ -15,12 +16,14 @@ def validate_template(template):
 
 def normalize_attribute(attribute):
     a = attribute.lower().strip()
-    a = a.replace('__','_')
+    a = re.sub('_+','_',a)
+    if a.isdigit():
+        return a
     a = re.sub('_*[0-9]+$','',a)
     return a
 
 def validate_attribute(attribute):
-    return not attribute.isdigit()
+    return not attribute.isdigit() and attribute != ''
 
 # Parses an infobox from the json-wikipedia dump
 def parse(infobox_template,description):
@@ -37,9 +40,18 @@ def parse(infobox_template,description):
     
 # Returns a list of all valid, normalized infobox attributes
 def get_attributes(infobox):
-    return [normalize_attribute(a) for a in infobox.params if validate_attribute(a)]
+    normalized = [normalize_attribute(a.name) for a in infobox.params]
+    return filter(lambda a: validate_attribute(a),normalized)
 
 # Returns a list of all normalized attributes
 def get_all_attributes(infobox):
-    return [normalize_attribute(a) for a in infobox.params]
+    return [normalize_attribute(a.name) for a in infobox.params]
 
+def get_items(infobox):
+    items = []
+    for p in infobox.params:
+        attribute = normalize_attribute(p.name)
+        value = DewikiParser().parse_string(p.value.strip())
+        if validate_attribute(attribute) and value != '':
+            items.append((attribute,value))
+    return items
