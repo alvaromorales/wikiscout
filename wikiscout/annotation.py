@@ -52,7 +52,7 @@ def replace_pronoun(object, symbol, tokenization):
 def replace_synonyms(object, symbol, tokenization):
     synonyms = wikikb.get_synonyms(object)
 
-    if len(synonyms) == 0:
+    if synonyms is None or len(synonyms) == 0:
         return False
 
     ok = False
