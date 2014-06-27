@@ -2,6 +2,11 @@ import mwparserfromhell
 from dewiki.parser import Parser as DewikiParser
 import re
 
+### Ignore
+
+ignore_attributes = set(['name','caption'])
+
+
 ### Templates
 
 def normalize_template(template):

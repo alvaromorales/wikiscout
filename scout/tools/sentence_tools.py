@@ -1,6 +1,9 @@
 import re
 from nltk.tokenize import sent_tokenize
 
+def has_value(s,value):
+    return re.search(r'\b%s\b'%re.escape(value),s) is not None
+
 def validate(sentence):
     sentence = sentence.strip()
     # valid sentences must contain at least one period

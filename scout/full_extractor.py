@@ -26,15 +26,13 @@ class MRExtractor(MRJob):
             
         self.top_attributes = top_attributes
 
-    def mapper(self, key, joined_article):
-        title = joined_article['wikiTitle']
-        en_article = joined_article['en']
-        simple_article = joined_article['simple']
-
-        if 'infobox' not in en_article:
+    def mapper(self, key, article):
+        if 'infobox' not in article:
             return
 
-        article_infobox = infobox.parse(en_article['infobox']['name'], en_article['infobox']['description'])
+        article_infobox = infobox.parse(article['infobox']['name'], article['infobox']['description'])
+
+        title = article['wikiTitle']
 
         if article_infobox is None:
             return
@@ -50,7 +48,7 @@ class MRExtractor(MRJob):
             if attribute in self.top_attributes[infobox_type] and attribute not in infobox.ignore_attributes:
                 matching_attributes[attribute] = value
 
-        simple_sentences = sentence_tools.get(simple_article['paragraphs'])
+        simple_sentences = sentence_tools.get(article['paragraphs'])
         candidate_sentences = {}
 
         for attribute,value in matching_attributes.items():
