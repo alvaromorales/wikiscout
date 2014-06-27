@@ -1,5 +1,5 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='WikiScout',
-      packages=['wikiscout']
+      packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests","*.scripts", "*.scripts.*", "scripts.*", "scripts"])
   )
