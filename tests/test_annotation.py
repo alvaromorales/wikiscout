@@ -103,8 +103,8 @@ class TestProperNouns(unittest.TestCase):
         self.assertEquals(actual, expected)
 
     def test_shortest_path(self):
-        object = 'Bill Gates'
-        sentence = 'Bill Gates studied at Harvard'
+        object = 'Mark Zuckerberg'
+        sentence = 'Zuck studied at Harvard'
         expected = 'any-wikipedia-person studied at any-wikipedia-university'
         tokenization = tokenize.tokenize(sentence)[0]
         annotation.replace_proper_nouns(object, tokenization)
