@@ -22,7 +22,7 @@ class Tokenization:
         logger.debug('Replaced %s with %s' % (token, new_token))
         return new_token
 
-    def join_tokens(self, tokenization):
+    def join_tokens(self):
         return " ".join([t.value for t in self.tokens])
 
     def __str__(self):
