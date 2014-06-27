@@ -25,14 +25,16 @@ class WikiScoutHandler(SocketServer.StreamRequestHandler):
                 a = annotation.annotate(sentence, object)
                 self.wfile.write(a.join_tokens() + "\n")
             except annotation.ObjectNotFoundException as e:
+                logging.exception(e)
                 self.wfile.write('ERROR: %s' % e)
             except annotation.ObjectSymbolNotFoundException as e:
+                logging.exception(e)
                 self.wfile.write('ERROR: %s' % e)
 
         print '-----------------------------------\n'
 
 if __name__ == "__main__":
-    format="%(levelname)s %(name)s %(funcName)30s:%(lineno)d:\t%(message)s"
+    format="[%(levelname)s %(name)s %(funcName)s:%(lineno)d]\t\t%(message)s"
     logging.basicConfig(level=logging.DEBUG, format=format)
     HOST, PORT = "malta.csail.mit.edu", 8088
 
