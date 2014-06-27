@@ -4,10 +4,10 @@ from nltk.tokenize import sent_tokenize
 def validate(sentence):
     sentence = sentence.strip()
     # valid sentences must contain at least one period
-    return sentence.find('.') != -1 and re.match('^TEMPLATE\[[iI]nfobox_',sentence) is None
+    return sentence.find('.') != -1 and re.match('TEMPLATE\[[iI]nfobox',sentence) is None
 
 def normalize(sentence):
-    sentence = re.sub('(?i)TEMPLATE\[cite_.*?\]','',sentence)
+    sentence = re.sub('(?i)TEMPLATE\[.*?\]','',sentence)
     sentence = sentence.strip()
     return sentence
 
@@ -17,5 +17,6 @@ def get(paragraphs):
 
     text = " ".join(paragraphs)
     sentences = sent_tokenize(text)
-
+    sentences = filter(lambda s: s.find('=') == -1, sentences)
+    
     return sentences

@@ -25,6 +25,12 @@ def normalize_attribute(attribute):
 def validate_attribute(attribute):
     return not attribute.isdigit() and attribute != ''
 
+### Values
+
+def validate_value(value):
+    # ignore dates?
+    return not value.isdigit() and len(value) > 1 and value != '(TEMPLATE)'
+
 # Parses an infobox from the json-wikipedia dump
 def parse(infobox_template,description):
     infobox_contents = ''.join(['|','|'.join(description)])
