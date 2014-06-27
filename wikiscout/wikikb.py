@@ -1,12 +1,13 @@
 from pymongo import MongoClient
 import infobox
 
+
 def _connect(host='localhost'):
     """Returns a client and db connection to a MongoDB host with WikiKB
     data."""
-    client = MongoClient(host,27017)
+    client = MongoClient(host, 27017)
     db = client.wiki
-    return (client,db)
+    return (client, db)
 
 
 def get_article(title, lang='en'):
@@ -38,7 +39,7 @@ def get_infobox(title, lang='en'):
       title (str): The title of the article.
       lang (str): The language of the article. Defaults to 'en'.
     """
-    article = get_article(title,lang)
+    article = get_article(title, lang)
 
     if article is None or 'infobox' not in article:
         return None
@@ -47,7 +48,7 @@ def get_infobox(title, lang='en'):
     return article_infobox
 
 
-def get(cls,title,attribute):
+def get(cls, title, attribute):
     """Gets the value of an infobox attribute.
 
     Args:
@@ -63,7 +64,7 @@ def get(cls,title,attribute):
     return None
 
 
-def get_attributes(cls,title):
+def get_attributes(cls, title):
     """Gets the attributes in an article's infobox.
 
     Args:
@@ -83,11 +84,24 @@ def get_classes(title):
       title (str): The article title.
     """
     article = get_article(title)
-    
+
     if article:
-        wiki_classes = ['wikipedia-term','wikipedia-paragraphs']
+        wiki_classes = ['wikipedia-term', 'wikipedia-paragraphs']
         article_infobox = get_infobox(title)
         if article_infobox:
             wiki_classes.append(article_infobox.name)
         return wiki_classes
     return []
+
+
+def get_synonyms(title):
+    """Gets an article's synonyms
+
+    Args:
+      title (str): The article title.
+    """
+    client, db = _connect()
+    synonyms = db.synonyms.find_one({'title': title})
+    if synonyms is not None:
+        return synonyms['synonyms']
+    return None
