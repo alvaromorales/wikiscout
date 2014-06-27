@@ -1,6 +1,9 @@
+import logging
 import requests
 import xmltodict
 
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
 
 class STARTParseResponseException(Exception):
     pass
