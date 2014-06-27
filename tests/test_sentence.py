@@ -30,7 +30,7 @@ class TestContains(unittest.TestCase):
         value = "Harvard University"
         self.assertTrue(sentence.has_value(s, value))
 
-    def test_possesive_value_match(self):
+    def test_possessive_value_match(self):
         s = "Mark Zuckerberg is one of Harvard University's most notable alumni."
         value = "Harvard University"
         self.assertTrue(sentence.has_value(s, value))
@@ -40,7 +40,7 @@ class TestContains(unittest.TestCase):
         values = ["Harvard University", "Harvard"]
         self.assertTrue(sentence.contains(s, values))
 
-    def test_possesive_synonym_match(self):
+    def test_possessive_synonym_match(self):
         s = "Mark Zuckerberg is one of Harvard's most notable alumni."
         values = ["Harvard University", "Harvard"]
         self.assertTrue(sentence.contains(s, values))
