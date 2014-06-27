@@ -29,6 +29,7 @@ def validate(sentence):
 
 
 def normalize(sentence):
+    sentence = unicode(sentence)
     sentence = re.sub('(?i)TEMPLATE\[.*?\]','',sentence)
     sentence = unidecode(sentence)
     sentence = sentence.strip()
