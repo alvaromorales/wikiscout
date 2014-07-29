@@ -22,7 +22,9 @@ class WikiScoutHandler(SocketServer.StreamRequestHandler):
             object = data[1][1:-1]
             sentence = data[2][1:-1]
             try:
+                logging.info("Sentence: %s" % sentence)
                 a = annotation.annotate(sentence, object)
+                logging.info("Annotation: %s" % a.join_tokens())
                 self.wfile.write(a.join_tokens() + "\n")
             except annotation.ObjectNotFoundException as e:
                 logging.exception(e)

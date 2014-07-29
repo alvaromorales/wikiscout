@@ -104,9 +104,9 @@ def replace_proper_nouns(object, tokenization):
                             t, 'any-%s\'s' % cls)
                         ok = True
                     else:
-                        logging.debug('Could not find a matching symbol for %s' % t)
+                        logging.debug('Could not find a matching symbol for %s' % t.value)
                 else:
-                    logging.debug('Could not find a matching symbol for %s' % t)
+                    logging.debug('Could not find a matching symbol for %s' % t.value)
         else:
             cls = wikikb.get_class(t.value)
             if cls:
@@ -122,9 +122,9 @@ def replace_proper_nouns(object, tokenization):
                             t, 'any-%s' % cls)
                         ok = True
                     else:
-                        logging.debug('Could not find a matching symbol for %s' % t)
+                        logging.debug('Could not find a matching symbol for %s' % t.value)
                 else:
-                    logging.debug('Could not find a matching symbol for %s' % t)
+                    logging.debug('Could not find a matching symbol for %s' % t.value)
 
     return ok
 
