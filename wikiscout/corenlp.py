@@ -4,7 +4,9 @@ import jsonrpclib
 from simplejson import loads
 from nltk.corpus import stopwords
 
-tagmap = { 'DATE': 'any-date' }
+tagmap = {'DATE': 'any-date',
+          'NUMBER': 'any-number'}
+
 stopwords = set(stopwords.words('english'))
 punctuation = set(punctuation)
 numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
@@ -15,7 +17,7 @@ numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
 
 
 def _connect(host='localhost'):
-    return jsonrpclib.Server("http://%s:6888"%host)
+    return jsonrpclib.Server("http://%s:6888" % host)
 
 
 def parse(text):
@@ -53,12 +55,12 @@ def ner(text):
         return
 
     new_text = []
-    
+
     for sentence in text_parse['sentences']:
         if 'words' not in sentence:
             continue
-        
-        for word,attributes in sentence['words']:
+
+        for word, attributes in sentence['words']:
             if word in stopwords or word.startswith('any-wikipedia-'):
                 new_text.append(word)
                 continue
@@ -80,11 +82,11 @@ def ner(text):
 
     if new_text.count('any-date') > 1:
         count = 1
-        for i,w in enumerate(new_text):
+        for i, w in enumerate(new_text):
             if w == 'any-date':
                 new_text[i] = index(w, count)
                 count += 1
-    
+
     sentence = ''.join(w if set(w) <= punctuation or w == "'s" else ' '+w for w in new_text).strip()
     sentence = re.sub(r'(\w)([\({(\[]|``)\s', r'\1 \2', sentence)
     sentence = sentence.replace('``', '"').replace('\'\'', '"')
