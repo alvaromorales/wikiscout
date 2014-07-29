@@ -174,7 +174,7 @@ class TestTagDates(unittest.TestCase):
     def test_no_dates(self):
         sentence = 'It is split in 3 parts'
         object = 'The Lord of the Rings'
-        expected = 'any-wikipedia-novel-series is split in 3 parts'
+        expected = 'any-wikipedia-novel-series is split in any-number parts'
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
 

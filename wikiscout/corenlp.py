@@ -5,7 +5,8 @@ from simplejson import loads
 from nltk.corpus import stopwords
 
 tagmap = {'DATE': 'any-date',
-          'NUMBER': 'any-number'}
+          'NUMBER': 'any-number',
+          'ORDINAL': 'any-ordinal'}
 
 stopwords = set(stopwords.words('english'))
 punctuation = set(punctuation)

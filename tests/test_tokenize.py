@@ -12,7 +12,7 @@ class TestComma(unittest.TestCase):
 
     def test_multiple_replacements(self):
         sentence = 'Air France Flight 447 was a scheduled commercial flight from Rio De Janeiro, Brazil, to Paris, France.'
-        expected = 'Air France Flight 447 was a scheduled commercial flight from Rio De Janeiro, Brazil to Paris, France'
+        expected = 'Air France Flight any-number was a scheduled commercial flight from Rio De Janeiro, Brazil to Paris, France'
         tokenization = tokenize.tokenize(sentence)[0]
         actual = tokenization.join_tokens()
 
