@@ -61,10 +61,18 @@ class Infobox:
 def get_class(template):
     """Returns a wikipedia class given an infobox template."""
     wiki_class = template.lower().strip()
+
+    if ':' in wiki_class:
+        wiki_class = wiki_class.split(':')[0]
+
+    wiki_class = re.sub(r'\([^\)]*\)', '', wiki_class).strip()
+
     wiki_class = re.sub(r'\n+', '', wiki_class)
     wiki_class = re.sub('_+', '-', wiki_class)
     wiki_class = re.sub('[ ]+', '-', wiki_class)
+    wiki_class = re.sub('-+$', '', wiki_class)
     wiki_class = re.sub(r'^infobox-', 'wikipedia-', wiki_class)
+
     return wiki_class
 
 
