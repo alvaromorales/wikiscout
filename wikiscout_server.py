@@ -9,7 +9,7 @@ class WikiScoutHandler(SocketServer.StreamRequestHandler):
     def handle(self):
         self.data = self.rfile.readline().strip()
 
-        print '-----------------------------------\n'
+        logger.info('-----------------------------------')
         logger.info('%s wrote: %s' % (self.client_address[0], self.data))
         
         data = OneOrMore(nestedExpr()).parseString(self.data)[0]
@@ -31,11 +31,12 @@ class WikiScoutHandler(SocketServer.StreamRequestHandler):
                 logging.exception(e)
                 self.wfile.write('ERROR: %s' % e)
 
-        print '-----------------------------------\n'
+        logger.info('-----------------------------------')
+
 
 if __name__ == "__main__":
     format="[%(levelname)s %(name)s %(funcName)s:%(lineno)d]\t\t%(message)s"
-    logging.basicConfig(level=logging.DEBUG, format=format)
+    logging.basicConfig(filename='/data/infolab/misc/wikiscout/log/server.log', level=logging.DEBUG, format=format)
     HOST, PORT = "malta.csail.mit.edu", 8088
 
     server = SocketServer.TCPServer((HOST, PORT), WikiScoutHandler)
