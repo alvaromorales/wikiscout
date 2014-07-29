@@ -167,7 +167,7 @@ class TestTagDates(unittest.TestCase):
     def test_multiple(self):
         sentence = 'Clinton served as governor of Arkansas from 1979 to 1981 and again from 1983 to 1993'
         object = 'Bill Clinton'
-        expected = 'any-wikipedia-president served as governor of any-wikipedia-u.s.-state from any-date-one to any-date-two and again from any-date-three to any-date-four'
+        expected = 'any-wikipedia-president served as governor of any-wikipedia-us-state from any-date-one to any-date-two and again from any-date-three to any-date-four'
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
 

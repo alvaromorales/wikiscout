@@ -71,6 +71,7 @@ def get_class(template):
     wiki_class = re.sub('_+', '-', wiki_class)
     wiki_class = re.sub('[ ]+', '-', wiki_class)
     wiki_class = re.sub('-+$', '', wiki_class)
+    wiki_class = re.sub('\.', '', wiki_class)
     wiki_class = re.sub(r'^infobox-', 'wikipedia-', wiki_class)
 
     return wiki_class

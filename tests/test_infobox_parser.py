@@ -11,3 +11,8 @@ class TestInfoboxTemplateNormalization(unittest.TestCase):
         template = 'Infobox Avatar: The Last Airbender character'
         expected = 'wikipedia-avatar'
         self.assertEquals(infobox_parser.get_class(template), expected)
+
+    def test_period(self):
+        template = 'Infobox U.S. state'
+        expected = 'wikipedia-us-state'
+        self.assertEquals(infobox_parser.get_class(template), expected)
