@@ -24,3 +24,30 @@ class TestComma(unittest.TestCase):
         tokenization = tokenize.tokenize(sentence)[0]
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
+
+
+class TestTruecase(unittest.TestCase):
+    def test_simple(self):
+        sentence = 'They have a varsity team and they compete in the Big East Conference'
+        tokenization = tokenize.tokenize(sentence)[0]
+        actual = tokenization.join_tokens()
+        self.assertEquals(actual, sentence)
+
+    def test_no_capitalization(self):
+        sentence = 'Curtin University is the largest university in Australia'
+        tokenization = tokenize.tokenize(sentence)[0]
+        actual = tokenization.join_tokens()
+        self.assertEquals(actual, sentence)
+
+    def test_with_commas(self):
+        sentence = 'Charing is a village and civil parish in Kent, England'
+        tokenization = tokenize.tokenize(sentence)[0]
+        actual = tokenization.join_tokens()
+        self.assertEquals(actual, sentence)
+
+    def test_case_with_parens(self):
+        sentence = 'Space Shuttle Endeavour (OV-105) is a space shuttle run by NASA.'
+        expected = 'Space Shuttle Endeavour is a space shuttle run by NASA'
+        tokenization = tokenize.tokenize(sentence)[0]
+        actual = tokenization.join_tokens()
+        self.assertEquals(actual, expected)

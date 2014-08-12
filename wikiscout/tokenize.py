@@ -32,7 +32,8 @@ class Token:
 
 class Tokenization:
     def __init__(self, start_tokenization, sentence):
-        tokens = replace_commas(sentence, start_tokenization['tokens']['token'])
+        tokens = truecase(sentence, start_tokenization['tokens']['token'])
+        tokens = replace_commas(sentence, tokens)
         self.tokens = [Token(t) for t in tokens]
         self.sentence = sentence
         self.unknown_words = []
@@ -149,3 +150,26 @@ def replace_commas(sentence, tokens):
                 break
 
     return tokens
+
+
+def truecase(sentence, tokens):
+    i = 0
+    result = []
+
+    for token in tokens:
+        token_chars = list(token)
+        j = 0
+        while j < len(token):
+            if sentence[i] == token[j]:
+                i += 1
+                j += 1
+            elif sentence[i].lower() == token[j].lower():
+                token_chars[j] = sentence[i]
+                i += 1
+                j += 1
+            else:
+                i += 1
+
+        result.append(''.join(token_chars))
+
+    return result
