@@ -139,7 +139,7 @@ def annotate(sentence, object):
             "Could not generate a matching symbol for object \"%s\"" % object)
 
     symbol = 'any-%s' % cls
-    tokenization = tokenize.tokenize(sentence)[0]
+    tokenization = tokenize.tokenize(sentence)
     logger.info('Tokenized as %s' % [t.value for t in tokenization.tokens])
 
     if replace_object(object, symbol, tokenization):

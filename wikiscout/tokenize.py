@@ -32,7 +32,12 @@ class Token:
 
 class Tokenization:
     def __init__(self, start_tokenization, sentence):
-        tokens = truecase(sentence, start_tokenization['tokens']['token'])
+        try:
+            tokens = truecase(sentence, start_tokenization['tokens']['token'])
+        except IndexError:
+            logger.debug("Could not truecase: %s" % start_tokenization['tokens']['token'])
+            pass
+
         tokens = replace_commas(sentence, tokens)
         self.tokens = [Token(t) for t in tokens]
         self.sentence = sentence
@@ -87,13 +92,13 @@ def tokenize(sentence, machine='malta'):
     response = start.tokenize(sentence, machine=machine)
 
     if 'tokenizations' not in response:
-        return []
+        return None
 
     tokenizations = response['tokenizations']['tokenization']
-    if type(tokenizations) is list:
-        return [Tokenization(t, sentence) for t in tokenizations]
+    if type(tokenizations) is list and len(tokenizations) > 0:
+        return Tokenization(tokenizations[0], sentence)
     else:
-        return [Tokenization(tokenizations, sentence)]
+        return Tokenization(tokenizations, sentence)
 
 
 def find(s, ch):
@@ -159,7 +164,7 @@ def truecase(sentence, tokens):
     for token in tokens:
         token_chars = list(token)
         j = 0
-        while j < len(token):
+        while j < len(token) and i < len(sentence):
             if sentence[i] == token[j]:
                 i += 1
                 j += 1

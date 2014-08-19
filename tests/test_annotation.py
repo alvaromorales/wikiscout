@@ -6,7 +6,7 @@ from wikiscout import tokenize
 
 class TestObject(unittest.TestCase):
     def helper(self, replacement_function, sentence, object, symbol, expected):
-        tokenization = tokenize.tokenize(sentence)[0]
+        tokenization = tokenize.tokenize(sentence)
         tokenization_copy = copy.deepcopy(tokenization)
         replacement_function(object, symbol, tokenization)
         actual = tokenization.join_tokens()
@@ -79,7 +79,7 @@ class TestProperNouns(unittest.TestCase):
         object = 'Bill Clinton'
         sentence = 'Bill Clinton married Hillary Rodham'
         expected = 'any-wikipedia-president married any-wikipedia-officeholder'
-        tokenization = tokenize.tokenize(sentence)[0]
+        tokenization = tokenize.tokenize(sentence)
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -88,7 +88,7 @@ class TestProperNouns(unittest.TestCase):
         object = 'Bill Clinton'
         sentence = 'Hillary Clinton\'s husband is Bill Clinton'
         expected = 'any-wikipedia-officeholder\'s husband is any-wikipedia-president'
-        tokenization = tokenize.tokenize(sentence)[0]
+        tokenization = tokenize.tokenize(sentence)
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -97,7 +97,7 @@ class TestProperNouns(unittest.TestCase):
         object = 'Mark Zuckerberg'
         sentence = 'Zuck dropped out of Harvard University to start Facebook'
         expected = 'any-wikipedia-person dropped out of any-wikipedia-university to start any-wikipedia-dot-com-company'
-        tokenization = tokenize.tokenize(sentence)[0]
+        tokenization = tokenize.tokenize(sentence)
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -106,7 +106,7 @@ class TestProperNouns(unittest.TestCase):
         object = 'Mark Zuckerberg'
         sentence = 'Zuck studied at Harvard'
         expected = 'any-wikipedia-person studied at any-wikipedia-university'
-        tokenization = tokenize.tokenize(sentence)[0]
+        tokenization = tokenize.tokenize(sentence)
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
