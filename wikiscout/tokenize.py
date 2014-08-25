@@ -1,4 +1,5 @@
 import start
+from start import STARTServerException
 import logging
 import corenlp
 
@@ -92,7 +93,10 @@ def tokenize(sentence, machine='malta'):
     response = start.tokenize(sentence, machine=machine)
 
     if 'tokenizations' not in response:
-        return None
+        if 'P' in response:
+            raise STARTServerException(response['P'])
+        else:
+            raise STARTServerException('Could not tokenize: %s' % sentence)
 
     tokenizations = response['tokenizations']['tokenization']
     if type(tokenizations) is list and len(tokenizations) > 0:
