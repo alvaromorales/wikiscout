@@ -6,7 +6,11 @@ from wikiscout import tokenize
 
 class TestObject(unittest.TestCase):
     def helper(self, replacement_function, sentence, object, symbol, expected):
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         tokenization_copy = copy.deepcopy(tokenization)
         replacement_function(object, symbol, tokenization)
         actual = tokenization.join_tokens()
@@ -79,7 +83,11 @@ class TestProperNouns(unittest.TestCase):
         object = 'Bill Clinton'
         sentence = 'Bill Clinton married Hillary Rodham'
         expected = 'any-wikipedia-president married any-wikipedia-officeholder'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -88,7 +96,11 @@ class TestProperNouns(unittest.TestCase):
         object = 'Bill Clinton'
         sentence = 'Hillary Clinton\'s husband is Bill Clinton'
         expected = 'any-wikipedia-officeholder\'s husband is any-wikipedia-president'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -97,7 +109,11 @@ class TestProperNouns(unittest.TestCase):
         object = 'Mark Zuckerberg'
         sentence = 'Zuck dropped out of Harvard University to start Facebook'
         expected = 'any-wikipedia-person dropped out of any-wikipedia-university to start any-wikipedia-dot-com-company'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -106,7 +122,11 @@ class TestProperNouns(unittest.TestCase):
         object = 'Mark Zuckerberg'
         sentence = 'Zuck studied at Harvard'
         expected = 'any-wikipedia-person studied at any-wikipedia-university'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         annotation.replace_proper_nouns(object, tokenization)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -167,14 +187,22 @@ class TestTagDates(unittest.TestCase):
     def test_multiple(self):
         sentence = 'Clinton served as governor of Arkansas from 1979 to 1981 and again from 1983 to 1993'
         object = 'Bill Clinton'
+<<<<<<< HEAD
         expected = 'any-wikipedia-president served as governor of any-wikipedia-us-state from any-date-one to any-date-two and again from any-date-three to any-date-four'
+=======
+        expected = 'any-wikipedia-president served as governor of any-wikipedia-u.s.-state from any-date-one to any-date-two and again from any-date-three to any-date-four'
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
 
     def test_no_dates(self):
         sentence = 'It is split in 3 parts'
         object = 'The Lord of the Rings'
+<<<<<<< HEAD
         expected = 'any-wikipedia-novel-series is split in any-number parts'
+=======
+        expected = 'any-wikipedia-novel-series is split in 3 parts'
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         a = annotation.annotate(sentence, object)
         self.assertEquals(a.join_tokens(), expected)
 

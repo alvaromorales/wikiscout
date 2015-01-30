@@ -6,14 +6,23 @@ class TestComma(unittest.TestCase):
     def test_within_token(self):
         sentence = 'Osgoode Hall Law School is in Toronto, Ontario Canada.'
         expected = 'Osgoode Hall Law School is in Toronto, Ontario Canada'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
 
     def test_multiple_replacements(self):
         sentence = 'Air France Flight 447 was a scheduled commercial flight from Rio De Janeiro, Brazil, to Paris, France.'
+<<<<<<< HEAD
         expected = 'Air France Flight any-number was a scheduled commercial flight from Rio De Janeiro, Brazil to Paris, France'
         tokenization = tokenize.tokenize(sentence)
+=======
+        expected = 'Air France Flight 447 was a scheduled commercial flight from Rio De Janeiro, Brazil to Paris, France'
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         actual = tokenization.join_tokens()
 
         self.assertEquals(actual, expected)
@@ -21,6 +30,7 @@ class TestComma(unittest.TestCase):
     def test_outside_token(self):
         sentence = 'Ludmilla Radchenko  (, born November 11, 1978 in Omsk, Soviet Union) is a Russian model, artist and actress.'
         expected = 'Ludmilla Radchenko is a Russian model artist and actress'
+<<<<<<< HEAD
         tokenization = tokenize.tokenize(sentence)
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)
@@ -49,5 +59,8 @@ class TestTruecase(unittest.TestCase):
         sentence = 'Space Shuttle Endeavour (OV-105) is a space shuttle run by NASA.'
         expected = 'Space Shuttle Endeavour is a space shuttle run by NASA'
         tokenization = tokenize.tokenize(sentence)
+=======
+        tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         actual = tokenization.join_tokens()
         self.assertEquals(actual, expected)

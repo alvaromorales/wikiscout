@@ -104,9 +104,15 @@ def replace_proper_nouns(object, tokenization):
                             t, 'any-%s\'s' % cls)
                         ok = True
                     else:
+<<<<<<< HEAD
                         logging.debug('Could not find a matching symbol for %s' % t.value)
                 else:
                     logging.debug('Could not find a matching symbol for %s' % t.value)
+=======
+                        logging.debug('Could not find a matching symbol for %s' % t)
+                else:
+                    logging.debug('Could not find a matching symbol for %s' % t)
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         else:
             cls = wikikb.get_class(t.value)
             if cls:
@@ -122,9 +128,15 @@ def replace_proper_nouns(object, tokenization):
                             t, 'any-%s' % cls)
                         ok = True
                     else:
+<<<<<<< HEAD
                         logging.debug('Could not find a matching symbol for %s' % t.value)
                 else:
                     logging.debug('Could not find a matching symbol for %s' % t.value)
+=======
+                        logging.debug('Could not find a matching symbol for %s' % t)
+                else:
+                    logging.debug('Could not find a matching symbol for %s' % t)
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 
     return ok
 
@@ -139,7 +151,11 @@ def annotate(sentence, object):
             "Could not generate a matching symbol for object \"%s\"" % object)
 
     symbol = 'any-%s' % cls
+<<<<<<< HEAD
     tokenization = tokenize.tokenize(sentence)
+=======
+    tokenization = tokenize.tokenize(sentence)[0]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
     logger.info('Tokenized as %s' % [t.value for t in tokenization.tokens])
 
     if replace_object(object, symbol, tokenization):

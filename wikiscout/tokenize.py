@@ -1,5 +1,8 @@
 import start
+<<<<<<< HEAD
 from start import STARTServerException
+=======
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 import logging
 import corenlp
 
@@ -33,6 +36,7 @@ class Token:
 
 class Tokenization:
     def __init__(self, start_tokenization, sentence):
+<<<<<<< HEAD
         try:
             tokens = truecase(sentence, start_tokenization['tokens']['token'])
         except IndexError:
@@ -40,6 +44,9 @@ class Tokenization:
             pass
 
         tokens = replace_commas(sentence, tokens)
+=======
+        tokens = replace_commas(sentence, start_tokenization['tokens']['token'])
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
         self.tokens = [Token(t) for t in tokens]
         self.sentence = sentence
         self.unknown_words = []
@@ -93,6 +100,7 @@ def tokenize(sentence, machine='malta'):
     response = start.tokenize(sentence, machine=machine)
 
     if 'tokenizations' not in response:
+<<<<<<< HEAD
         if 'P' in response:
             raise STARTServerException(response['P'])
         else:
@@ -103,6 +111,15 @@ def tokenize(sentence, machine='malta'):
         return Tokenization(tokenizations[0], sentence)
     else:
         return Tokenization(tokenizations, sentence)
+=======
+        return []
+
+    tokenizations = response['tokenizations']['tokenization']
+    if type(tokenizations) is list:
+        return [Tokenization(t, sentence) for t in tokenizations]
+    else:
+        return [Tokenization(tokenizations, sentence)]
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 
 
 def find(s, ch):
@@ -159,6 +176,7 @@ def replace_commas(sentence, tokens):
                 break
 
     return tokens
+<<<<<<< HEAD
 
 
 def truecase(sentence, tokens):
@@ -182,3 +200,5 @@ def truecase(sentence, tokens):
         result.append(''.join(token_chars))
 
     return result
+=======
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f

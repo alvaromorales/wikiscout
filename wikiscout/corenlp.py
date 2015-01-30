@@ -4,10 +4,14 @@ import jsonrpclib
 from simplejson import loads
 from nltk.corpus import stopwords
 
+<<<<<<< HEAD
 tagmap = {'DATE': 'any-date',
           'NUMBER': 'any-number',
           'ORDINAL': 'any-ordinal'}
 
+=======
+tagmap = { 'DATE': 'any-date' }
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 stopwords = set(stopwords.words('english'))
 punctuation = set(punctuation)
 numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
@@ -18,7 +22,11 @@ numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
 
 
 def _connect(host='localhost'):
+<<<<<<< HEAD
     return jsonrpclib.Server("http://%s:6888" % host)
+=======
+    return jsonrpclib.Server("http://%s:6888"%host)
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 
 
 def parse(text):
@@ -56,12 +64,21 @@ def ner(text):
         return
 
     new_text = []
+<<<<<<< HEAD
 
     for sentence in text_parse['sentences']:
         if 'words' not in sentence:
             continue
 
         for word, attributes in sentence['words']:
+=======
+    
+    for sentence in text_parse['sentences']:
+        if 'words' not in sentence:
+            continue
+        
+        for word,attributes in sentence['words']:
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
             if word in stopwords or word.startswith('any-wikipedia-'):
                 new_text.append(word)
                 continue
@@ -83,11 +100,19 @@ def ner(text):
 
     if new_text.count('any-date') > 1:
         count = 1
+<<<<<<< HEAD
         for i, w in enumerate(new_text):
             if w == 'any-date':
                 new_text[i] = index(w, count)
                 count += 1
 
+=======
+        for i,w in enumerate(new_text):
+            if w == 'any-date':
+                new_text[i] = index(w, count)
+                count += 1
+    
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
     sentence = ''.join(w if set(w) <= punctuation or w == "'s" else ' '+w for w in new_text).strip()
     sentence = re.sub(r'(\w)([\({(\[]|``)\s', r'\1 \2', sentence)
     sentence = sentence.replace('``', '"').replace('\'\'', '"')

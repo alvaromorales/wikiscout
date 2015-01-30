@@ -13,18 +13,26 @@ class STARTServerException(Exception):
     pass
 
 
+<<<<<<< HEAD
 def send_request(query, action, machine='malta.csail.mit.edu', server='guest', kb=False):
     usekb = 'no'
     if kb:
         usekb = 'yes'
 
+=======
+def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
     params = {'query': query,
               'referrer': 'http://start.csail.mit/wikiscout',
               'server': server,
               'machine': machine,
               'action': action,
               'qe': 'HTML',
+<<<<<<< HEAD
               'kb': usekb,
+=======
+              'kb': 'no',
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
               'te': 'XML',
               'de': 'no',
               'fg': 'yes'
@@ -44,11 +52,14 @@ def send_request(query, action, machine='malta.csail.mit.edu', server='guest', k
     return response
 
 
+<<<<<<< HEAD
 def ask(question, machine='malta.csail.mit.edu', server='guest'):
     response = send_request(question, 'askstart', machine=machine, server=server, kb=True)
     return response
 
 
+=======
+>>>>>>> 7e8fecb47ed018554811213dac196167c98ec94f
 def parse(sentence, machine='malta.csail.mit.edu', server='guest'):
     response = send_request(sentence, 'parse', machine=machine, server=server)
     return response
