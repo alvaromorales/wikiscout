@@ -13,14 +13,18 @@ class STARTServerException(Exception):
     pass
 
 
-def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
+def send_request(query, action, machine='malta.csail.mit.edu', server='guest', kb=False):
+    usekb = 'no'
+    if kb:
+        usekb = 'yes'
+
     params = {'query': query,
               'referrer': 'http://start.csail.mit/wikiscout',
               'server': server,
               'machine': machine,
               'action': action,
               'qe': 'HTML',
-              'kb': 'no',
+              'kb': usekb,
               'te': 'XML',
               'de': 'no',
               'fg': 'yes'
@@ -37,6 +41,11 @@ def send_request(query, action, machine='malta.csail.mit.edu', server='guest'):
     except:
         raise STARTParseResponseException('Could not parse START response.\nAction=%s, Query= "%s".\nResponse: %s' % (action, query, r.text[:250]))
 
+    return response
+
+
+def ask(question, machine='malta.csail.mit.edu', server='guest'):
+    response = send_request(question, 'askstart', machine=machine, server=server, kb=True)
     return response
 
 
